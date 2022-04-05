@@ -47,6 +47,26 @@ class BinaryTree {
         }
     }
 
+    levelOrder(node) {
+        const queue = [];
+
+        queue.push(node);
+
+        while (queue.length !== 0) {
+            let current = queue.shift();
+
+            console.log(` ${current.data}`); // Visiting
+
+            if (current.leftChild !== null)
+                queue.push(current.leftChild);
+
+            if (current.rightChild !== null)
+                queue.push(current.rightChild);
+
+        }
+
+    }
+
     // preOrder
     preOrderSuccessor(current) {
         if (current.leftChild) {
@@ -75,7 +95,7 @@ class BinaryTree {
     // inOrder
     inOrderSuccessor(current) {
         if (current.rightChild) {
-            return this.mostLeft(current.rightChild);
+            return this.leftMost(current.rightChild);
         }
 
         let successor = current.parent;
@@ -97,41 +117,34 @@ class BinaryTree {
             return successor;
         }
 
-        if (successor.rightChild === current || successor.rightChild === null) {
+        if (successor.rightChild === current) {
             return successor;
         }
 
-        successor = successor.rightChild;
+        current = successor.rightChild;
+        while (current) {
+            successor = this.leftMost(current);
 
-        while (successor) {
-            current = successor;
-            successor = current.leftChild;
-
-            while (successor) {
-                current = successor;
-                successor = current.leftChild;
-            }
-
-            successor = current.rightChild;
+            current = successor.rightChild;
         }
 
-        successor = current;
 
         return successor;
     }
+
     postOrderPreDecessor(current) {
 
     }
-    // mostLeft
-    mostLeft(current) {
+    // leftMost
+    leftMost(current) {
         while (current.leftChild) {
             current = current.leftChild;
         }
 
         return current;
     }
-    // mostRight
-    mostRight(current) {
+    // rightMost
+    rightMost(current) {
         while (current.rightChild) {
             current = current.rightChild;
         }
@@ -141,11 +154,34 @@ class BinaryTree {
 
     // inorder by parent
     inOrderByParent(root) {
-        let current = this.mostLeft(root);
+        let current = this.leftMost(root);
 
         while (current) {
             console.log(` ${current.data} `);
             current = this.inOrderSuccessor(current);
+        }
+    }
+
+    postOrderByParent(node) {
+        let current = null;
+        let successor = null;
+
+        current = this.leftMost(node);
+        successor = current.rightChild;
+
+        while (successor) {
+            current = successor;
+            successor = this.leftMost(current);
+
+            current = successor;
+            successor = current.rightChild;
+        }
+
+        console.log('current.data :>> ', current.data);
+
+        while (current) {
+            console.log(` ${current.data} `); // Visiting
+            current = this.postOrderSuccessor(current); // Traversal
         }
     }
 }
@@ -218,6 +254,7 @@ bt.inOrderByParent(bt.root);
 
 console.log('post order ---');
 bt.postOrder(bt.root);
+bt.postOrderByParent(bt.root);
 console.log('nodeA postorder successor :>>', bt.postOrderSuccessor(nodeA));
 console.log('nodeB postorder successor :>>', bt.postOrderSuccessor(nodeB).data);
 console.log('nodeC postorder successor :>>', bt.postOrderSuccessor(nodeC).data);
@@ -227,3 +264,6 @@ console.log('nodeF postorder successor :>>', bt.postOrderSuccessor(nodeF).data);
 console.log('nodeG postorder successor :>>', bt.postOrderSuccessor(nodeG).data);
 console.log('nodeH postorder successor :>>', bt.postOrderSuccessor(nodeH).data);
 console.log('nodeI postorder successor :>>', bt.postOrderSuccessor(nodeI).data);
+
+console.log('level order ---');
+bt.levelOrder(bt.root);
