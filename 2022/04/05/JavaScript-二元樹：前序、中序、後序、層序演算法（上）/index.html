@@ -36,7 +36,7 @@
 <meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/post-order.png">
 <meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/post-order.png">
 <meta property="article:published_time" content="2022-04-05T08:49:49.000Z">
-<meta property="article:modified_time" content="2022-04-05T08:49:49.488Z">
+<meta property="article:modified_time" content="2022-04-05T10:03:58.372Z">
 <meta property="article:author" content="Chen Po Yu">
 <meta property="article:tag" content="javascript, structure, tree">
 <meta name="twitter:card" content="summary_large_image">
@@ -219,7 +219,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      126 分钟
+      125 分钟
     </span>
   
 
@@ -323,22 +323,22 @@
 <h3 id="preOrder-node"><a href="#preOrder-node" class="headerlink" title="preOrder (node)"></a>preOrder (node)</h3><ul>
 <li>輸入： TreeNode 資料，作為『前序』尋訪起點</li>
 <li>輸出： -</li>
-<li>執行：前序尋訪，將訪問到的節點資料打印出來（使用佇列、遞回實作）</li>
+<li>執行：前序尋訪，將訪問到的節點資料打印出來（使用遞回實作）</li>
 </ul>
 <h3 id="inOrder-node"><a href="#inOrder-node" class="headerlink" title="inOrder (node)"></a>inOrder (node)</h3><ul>
 <li>輸入： TreeNode 資料，作為『中序』尋訪起點</li>
 <li>輸出： -</li>
-<li>執行：中序尋訪，將訪問到的節點資料打印出來（使用佇列、遞回實作）</li>
+<li>執行：中序尋訪，將訪問到的節點資料打印出來（使用遞回實作）</li>
 </ul>
 <h3 id="postOrder-node"><a href="#postOrder-node" class="headerlink" title="postOrder (node)"></a>postOrder (node)</h3><ul>
 <li>輸入： TreeNode 資料，作為『後序』尋訪起點</li>
 <li>輸出： -</li>
-<li>執行：後序尋訪，將訪問到的節點資料打印出來（使用佇列、遞回實作）</li>
+<li>執行：後序尋訪，將訪問到的節點資料打印出來（使用遞回實作）</li>
 </ul>
 <h3 id="levelOrder-node"><a href="#levelOrder-node" class="headerlink" title="levelOrder (node)"></a>levelOrder (node)</h3><ul>
 <li>輸入： TreeNode 資料，作為『層序』尋訪起點</li>
 <li>輸出： -</li>
-<li>執行：層序尋訪，將訪問到的節點資料打印出來（使用佇列、遞回實作）</li>
+<li>執行：層序尋訪，將訪問到的節點資料打印出來（使用遞回實作）</li>
 </ul>
 <h3 id="preOrderByParent-node"><a href="#preOrderByParent-node" class="headerlink" title="preOrderByParent (node)"></a>preOrderByParent (node)</h3><ul>
 <li>輸入： TreeNode 資料，作為『前序』尋訪起點</li>
@@ -376,7 +376,7 @@
 <li>輸入： TreeNode 資料，任一樹中節點</li>
 <li>輸出： 該輸入節點開始，右子樹方向，最右的節點</li>
 </ul>
-<h2 id="演算法實作『前序』"><a href="#演算法實作『前序』" class="headerlink" title="演算法實作『前序』"></a>演算法實作『前序』</h2><h3 id="preOrder-node-1"><a href="#preOrder-node-1" class="headerlink" title="preOrder (node)"></a>preOrder (node)</h3><p>使用『佇列 queue』的資料結構和『遞迴 recursion』的概念即可快速的實作出，前序演算法。</p>
+<h2 id="演算法實作『前序』"><a href="#演算法實作『前序』" class="headerlink" title="演算法實作『前序』"></a>演算法實作『前序』</h2><h3 id="preOrder-node-1"><a href="#preOrder-node-1" class="headerlink" title="preOrder (node)"></a>preOrder (node)</h3><p>使用『遞迴 recursion』的概念即可快速的實作出，前序演算法。</p>
 <p>為求效能、彈性接著會在實作 <code>preOrderByParent (node)</code> 來完成同樣效果的演算法。</p>
 <p>我們知道前序尋訪優先順序是</p>
 <ol>
@@ -387,7 +387,7 @@
 <p>至此，讓我們將代碼建構出來</p>
 <figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">function preOrder (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">    if</span> (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">        console</span>.log(` This <span class="hljs-keyword">node</span><span class="hljs-title">&#x27;s</span> data: $&#123;node.data&#125;`);<br>        preOrder(node.leftChild);<br>        preOrder(node.rightChild);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<p>通過依照前序尋訪的優先順序進行『遞回』呼叫，來達成『佇列』先進後出的效果，即可完成。</p>
+<p>通過依照前序尋訪的優先順序進行『遞回』呼叫，來達成『推疊 stack』先進後出的效果，即可完成。</p>
 <blockquote>
 <p>if 判斷式用來作為『遞回』的結束條件</p>
 </blockquote>
@@ -466,7 +466,7 @@
 <h3 id="preOrderByParent-node-1"><a href="#preOrderByParent-node-1" class="headerlink" title="preOrderByParent(node)"></a>preOrderByParent(node)</h3><p>上面，我們已經完成，前序規則下，下一個節點的找尋函式，那麼讓我們將原本遞迴（recursion）方式寫成的前序演算法改寫下吧</p>
 <figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-keyword">function</span> <span class="hljs-title function_">preOrderByParent</span> (<span class="hljs-params">node</span>) &#123;<br>    let current = node;<br><br>    <span class="hljs-keyword">while</span> (current) &#123;<br>        <span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span>(<span class="hljs-string">` <span class="hljs-subst">$&#123;current.data&#125;</span>`</span>); <span class="hljs-comment">// Visiting</span><br>        current = preOrderSuccessor(current); <span class="hljs-comment">// Traversal</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<h2 id="演算法實作『中序』"><a href="#演算法實作『中序』" class="headerlink" title="演算法實作『中序』"></a>演算法實作『中序』</h2><h3 id="inOrder-node-1"><a href="#inOrder-node-1" class="headerlink" title="inOrder (node)"></a>inOrder (node)</h3><p>使用『佇列 queue』的資料結構和『遞迴 recursion』的概念即可快速的實作出，中序演算法。</p>
+<h2 id="演算法實作『中序』"><a href="#演算法實作『中序』" class="headerlink" title="演算法實作『中序』"></a>演算法實作『中序』</h2><h3 id="inOrder-node-1"><a href="#inOrder-node-1" class="headerlink" title="inOrder (node)"></a>inOrder (node)</h3><p>使用『遞迴 recursion』的概念即可快速的實作出，中序演算法。</p>
 <p>為求效能、彈性接著會在實作 <code>inOrderByParent (node)</code> 來完成同樣效果的演算法。</p>
 <p>我們知道中序尋訪優先順序是</p>
 <ol>
@@ -477,7 +477,7 @@
 <p>至此，讓我們將代碼建構出來</p>
 <figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">function inOrder (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">    if</span> (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">        preOrder</span>(node.leftChild);<br>        console.log(` This <span class="hljs-keyword">node</span><span class="hljs-title">&#x27;s</span> data: $&#123;node.data&#125;`);<br>        preOrder(node.rightChild);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<p>通過依照中序尋訪的優先順序進行『遞回』呼叫，來達成『佇列』先進後出的效果，即可完成。</p>
+<p>通過依照中序尋訪的優先順序進行『遞回』呼叫，來達成『推疊 stack』先進後出的效果，即可完成。</p>
 <blockquote>
 <p>if 判斷式用來作為『遞回』的結束條件</p>
 </blockquote>
@@ -557,7 +557,7 @@
 <h3 id="inOrderByParent-node-1"><a href="#inOrderByParent-node-1" class="headerlink" title="inOrderByParent (node)"></a>inOrderByParent (node)</h3><p>上述，我們完成了前置作業，讓我們接著完成中序尋訪（非遞迴版本）吧</p>
 <figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-keyword">function</span> <span class="hljs-title function_">inOrderByParent</span> (<span class="hljs-params">node</span>) &#123;<br>    let current = leftMost(node);<br><br>    <span class="hljs-keyword">while</span> (current) &#123;<br>        <span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span>(<span class="hljs-string">` <span class="hljs-subst">$&#123;current.data&#125;</span> `</span>); <span class="hljs-comment">// Visiting</span><br>        current = inOrderSuccessor(current); <span class="hljs-comment">// Traversal</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<h2 id="演算法實作『後序』"><a href="#演算法實作『後序』" class="headerlink" title="演算法實作『後序』"></a>演算法實作『後序』</h2><h3 id="postOrder-node-1"><a href="#postOrder-node-1" class="headerlink" title="postOrder (node)"></a>postOrder (node)</h3><p>使用『佇列 queue』的資料結構和『遞迴 recursion』的概念即可快速的實作出，後序演算法。</p>
+<h2 id="演算法實作『後序』"><a href="#演算法實作『後序』" class="headerlink" title="演算法實作『後序』"></a>演算法實作『後序』</h2><h3 id="postOrder-node-1"><a href="#postOrder-node-1" class="headerlink" title="postOrder (node)"></a>postOrder (node)</h3><p>使用『遞迴 recursion』的概念即可快速的實作出，後序演算法。</p>
 <p>為求效能、彈性接著會在實作 <code>postOrderByParent (node)</code> 來完成同樣效果的演算法。</p>
 <p>我們知道後序尋訪優先順序是</p>
 <ol>
@@ -568,7 +568,7 @@
 <p>至此，讓我們將代碼建構出來</p>
 <figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">function postOrder (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">    if</span> (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">        preOrder</span>(node.leftChild);<br>        preOrder(node.rightChild);<br>        console.log(` This <span class="hljs-keyword">node</span><span class="hljs-title">&#x27;s</span> data: $&#123;node.data&#125;`);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<p>通過依照後序尋訪的優先順序進行『遞回』呼叫，來達成『佇列』先進後出的效果，即可完成。</p>
+<p>通過依照後序尋訪的優先順序進行『遞回』呼叫，來達成『推疊 stack』先進後出的效果，即可完成。</p>
 <blockquote>
 <p>if 判斷式用來作為『遞回』的結束條件</p>
 </blockquote>
