@@ -16,18 +16,18 @@
   <meta name="author" content="Chen Po Yu">
   <meta name="keywords" content="">
   
-    <meta name="description" content="JavaScript 的原型鏈（prototype chain）對於第一次接觸且已經熟悉面向對象編程（object-oriented programming，OOP）的新手，可能會感到困惑。 JavaScript 的設計者 Brendan Erich 選擇以一種截然不同的方式，來設計 OOP 中的『繼承 inheritance』，這樣選擇的初衷究竟是什麼？推薦可以看下 JavaScript 繼承機">
+    <meta name="description" content="前言JavaScript 的原型鏈（prototype chain）對於第一次接觸且已經熟悉面向對象編程（object-oriented programming，OOP）的新手，可能會感到困惑。 JavaScript 的設計者 Brendan Erich 選擇以一種截然不同的方式，來設計 OOP 中的『繼承 inheritance』，這樣選擇的初衷究竟是什麼？推薦可以看下 JavaScript">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JavaScript 世界起源上（原型鏈）">
 <meta property="og:url" content="http://example.com/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/index.html">
 <meta property="og:site_name" content="pyshif blog">
-<meta property="og:description" content="JavaScript 的原型鏈（prototype chain）對於第一次接觸且已經熟悉面向對象編程（object-oriented programming，OOP）的新手，可能會感到困惑。 JavaScript 的設計者 Brendan Erich 選擇以一種截然不同的方式，來設計 OOP 中的『繼承 inheritance』，這樣選擇的初衷究竟是什麼？推薦可以看下 JavaScript 繼承機">
+<meta property="og:description" content="前言JavaScript 的原型鏈（prototype chain）對於第一次接觸且已經熟悉面向對象編程（object-oriented programming，OOP）的新手，可能會感到困惑。 JavaScript 的設計者 Brendan Erich 選擇以一種截然不同的方式，來設計 OOP 中的『繼承 inheritance』，這樣選擇的初衷究竟是什麼？推薦可以看下 JavaScript">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/object-layout.png">
 <meta property="og:image" content="http://example.com/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/regular.png">
 <meta property="og:image" content="http://example.com/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/full.png">
 <meta property="article:published_time" content="2022-04-15T18:23:10.000Z">
-<meta property="article:modified_time" content="2022-04-16T18:01:09.971Z">
+<meta property="article:modified_time" content="2022-04-17T09:11:57.553Z">
 <meta property="article:author" content="Chen Po Yu">
 <meta property="article:tag" content="javascript, prototype, this, function">
 <meta name="twitter:card" content="summary_large_image">
@@ -201,7 +201,7 @@
   
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      11k 字
+      12k 字
     </span>
   
 
@@ -210,7 +210,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      96 分钟
+      97 分钟
     </span>
   
 
@@ -242,7 +242,9 @@
             <h1 style="display: none">JavaScript 世界起源上（原型鏈）</h1>
             
             <div class="markdown-body">
-              <p>JavaScript 的原型鏈（prototype chain）對於第一次接觸且已經熟悉面向對象編程（object-oriented programming，OOP）的新手，可能會感到困惑。</p>
+              <!-- // FIXME: JavaScript 世界起源上下，文章連結加上 -->
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>JavaScript 的原型鏈（prototype chain）對於第一次接觸且已經熟悉面向對象編程（object-oriented programming，OOP）的新手，可能會感到困惑。</p>
 <p>JavaScript 的設計者 Brendan Erich 選擇以一種截然不同的方式，來設計 OOP 中的『繼承 inheritance』，這樣選擇的初衷究竟是什麼？推薦可以看下 <a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2011/06/designing_ideas_of_inheritance_mechanism_in_javascript.html">JavaScript 繼承機制設計思想｜阮一峰的網路日誌</a></p>
 <blockquote>
 <p>JavaScript 以下簡稱 JS</p>
@@ -497,24 +499,28 @@
 <p>首先，我們思考下這裡的 <code>Object</code> 和 <code>Function</code> 是什麼？</p>
 <p>是『物件 object』這點應該毋庸置疑，然而其實也是『函式 function』，在這也可以說是『建構式 constructor』</p>
 <p>那麼，作為一個『建構式』是『函式也是物件』，自然而然繼承了『物件的原型』和『函式的原型』也不奇怪吧！</p>
+<blockquote>
+<p>JS 中的原型繼承，一次只能繼承一個物件；從心裡模型來看，所謂的『函式』繼承『物件原型』和『函式原型』，實際上的原型鏈關係其實是『函式實例 繼承函式原型』，『函式原型 繼承 物件原型』</p>
+</blockquote>
 <p>所以，讓我們多加幾行代碼</p>
 <p><a href="prototype.js">prototype.js</a></p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// 作為一個 Object() 建構式，繼承了『物件原型』和『函式原型』</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Object instanceof Object :&gt;&gt; &#x27;</span>, <span class="hljs-title class_">Object</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Object</span>); <span class="hljs-comment">// true</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Object instanceof Function :&gt;&gt; &#x27;</span>, <span class="hljs-title class_">Object</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Function</span>); <span class="hljs-comment">// true</span><br><span class="hljs-comment">// 作為一個 Function() 建構式，繼承了『物件原型』和『函式原型』</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Function instanceof Object :&gt;&gt; &#x27;</span>, <span class="hljs-title class_">Function</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Object</span>); <span class="hljs-comment">// true</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Function instanceof Function :&gt;&gt; &#x27;</span>, <span class="hljs-title class_">Function</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Function</span>); <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure>
 
 <p>至此，當我們拋開 <code>instanceof</code> 前方混淆我們的 <code>Object</code> 和 <code>Function</code>，從『建構式 constructor』的角度切入理解，我們就可以了解為什麼會有看似『雞生蛋，蛋生雞』的現象</p>
 <blockquote>
-<p>從上面這樣的觀念，我們不難想像，所有的『建構式』或更直接點『函式』都同時繼承了『物件 <code>Object.prototype</code>、函式 <code>Function.prototype</code>』兩個原型</p>
+<p>從上面這樣的觀念，我們不難想像，所有的『建構式』或更直接點『函式』都擁有『物件 <code>Object.prototype</code>、函式 <code>Function.prototype</code>』兩個原型</p>
 </blockquote>
 <p>從建構心裡模型的角度來看，直接拉關聯線指向彼此似乎不是一個好的方式，所以我們將 <code>Function.prototype</code> 做一個替身單獨拉出來，讓所有原型鏈關係圖中的物件可以更清楚、容易的指向它</p>
 <p>最後，我們的心裡模型圖變成這樣</p>
 <p><img src="/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/full.png" srcset="/img/loading.gif" lazyload></p>
 <h2 id="觀念總結"><a href="#觀念總結" class="headerlink" title="觀念總結"></a>觀念總結</h2><ul>
-<li>『函式』在 JS 中既是『函式 function』也是『對象 object』；所以函式『原型繼承』了 『函式原型 <code>Function.prototype</code>』和『物件原型 <code>Object.prototype</code>』</li>
+<li>『函式』在 JS 中既是『函式 function』也是『對象 object』；所以函式（函式原型的實例）在『原型鏈』當中同時擁有 『函式原型 <code>Function.prototype</code>』和『物件原型 <code>Object.prototype</code>』</li>
 <li>『建構式』本質上就是『函式』，創建對象的工作其實由 <code>new</code> 運算子完成</li>
 <li><code>new</code> 運算子在創建對象過程中做的 4 件事『建立空物件、連結原型鏈、<code>this</code> 指向、和返回』</li>
 <li>想知道一個函式中 <code>this</code> 指向誰，就要看在執行階段時，是誰（object）呼叫了這個函式</li>
 <li>『函式原型 <code>Function.prototype</code>』的 3 個方法『<code>call</code>、<code>apply</code>、<code>bind</code>』可以用來控制『函式內 <code>this</code> 的指向』</li>
 <li>『原型鏈』來自『原型繼承』這個機制的產物，而『原型繼承』則是被設計來將『物件』之間關聯起來（共享數據）</li>
+<li>JS 中的『原型繼承』，一個物件只能繼承一個物件</li>
 <li>JS 的世界中沒有『類 class』和『繼承 inheritance』的概念，取而代之的是『物件 object』和『原型繼承 prototypal inheritance』</li>
 </ul>
 <h2 id="參考文件"><a href="#參考文件" class="headerlink" title="參考文件"></a>參考文件</h2><ul>
