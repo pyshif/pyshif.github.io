@@ -1,0 +1,773 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fish-favicon.png">
+  <link rel="icon" href="/img/fish-favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Chen Po Yu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言『網頁前端』的基礎是 HTML、CSS、JavaScript，通常情況下，很好理解和上手；然而，在某一天我們接觸了『前端框架』，可能是 Vue、React、或 Angular，突然間我們就變笨了。 學習 React 時，使用 create-react-app 這個工具，一下子就可以幫你把整個 React 開發環境建構好。接著，你只要在熟悉下 JSX 語法，很快就可以開始製作你的 SPA 網頁了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="懵懂 Webpack 5 (React)">
+<meta property="og:url" content="http://example.com/2022/12/26/%E6%87%B5%E6%87%82-Webpack-5-React/index.html">
+<meta property="og:site_name" content="pyshif blog">
+<meta property="og:description" content="前言『網頁前端』的基礎是 HTML、CSS、JavaScript，通常情況下，很好理解和上手；然而，在某一天我們接觸了『前端框架』，可能是 Vue、React、或 Angular，突然間我們就變笨了。 學習 React 時，使用 create-react-app 這個工具，一下子就可以幫你把整個 React 開發環境建構好。接著，你只要在熟悉下 JSX 語法，很快就可以開始製作你的 SPA 網頁了">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-12-26T01:06:40.000Z">
+<meta property="article:modified_time" content="2023-06-19T09:38:54.485Z">
+<meta property="article:author" content="Chen Po Yu">
+<meta property="article:tag" content="webpack, react, vue, babel, bundler">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+    <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-LG5KBKG5S0"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date());
+gtag("config", "G-LG5KBKG5S0"); </script>
+  
+  <title>懵懂 Webpack 5 (React) - pyshif blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  <link rel="stylesheet" href="/css/about-avatar.css" />
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Web Learning</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/your-advice/">
+                <i class="iconfont icon-pen"></i>
+                Your Advice
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="懵懂 Webpack 5 (React)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-12-26 01:06" pubdate>
+          December 26, 2022 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          10k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          85 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">懵懂 Webpack 5 (React)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>『網頁前端』的基礎是 HTML、CSS、JavaScript，通常情況下，很好理解和上手；然而，在某一天我們接觸了『前端框架』，可能是 Vue、React、或 Angular，突然間我們就變笨了。</p>
+<p>學習 React 時，使用 <code>create-react-app</code> 這個工具，一下子就可以幫你把整個 React 開發環境建構好。接著，你只要在熟悉下 JSX 語法，很快就可以開始製作你的 SPA 網頁了。</p>
+<blockquote>
+<p><code>create-react-app</code>：React 官方提供的快速建構專案工具（不推薦使用於正式環境）</p>
+</blockquote>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://reactjs.org/docs/introducing-jsx.html">JSX</a> 全稱 JavaScript XML，讓我們能夠在 JavaScript 中撰寫 HTML 的語法；但是注意他不是 HTML 也不是字串，這樣的語法會透過特定的編譯器（ex. Babel），轉譯成合法的 JavaScript 語言。</p>
+</blockquote>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Glossary/SPA">SPA</a> 全稱 Single-page application，單頁應用。意思就是，網頁只存在單一個文件（HTML 檔），並透過 JavaScript APIs 來置換其中內容，達成換頁的效果。</p>
+</blockquote>
+<p>那麼這些事情，究竟和 Webpack 有什麼關係呢？學習 Webpack 可以幹嘛？</p>
+<p>首先，我想當然是，你會更了解專案的建構過程；再來也是最大的好處，就是可以自行掌握『專案需要引入的工具、進行各種優化、和開發環境設定』。</p>
+<p>如果你像我一樣想要『掌控整個專案、理解背後的建構流程』，那麼我建議你：</p>
+<ul>
+<li>重新手動建構一個小專案，不要使用 <code>create-react-app</code> 或任何建構工具</li>
+<li>從閱讀 <a target="_blank" rel="noopener" href="https://webpack.js.org/concepts/">Webpack: Concepts</a> 官方文件開始，跟著動手做</li>
+</ul>
+<blockquote>
+<p>從官方文件學習的好處之一就是，你可以不用擔心資訊正確性的問題；然而，如果你覺得有必要，也可以試著搜集下其他不同的資訊，從多方面來了解。</p>
+</blockquote>
+<p>這是一段有點艱澀的路，但堅持下去。很快你就會開始對於專案是如何被建構出來，有點感覺了！</p>
+<p>在本篇文章中，我會試著從更高的層面開始，用淺白的話來解釋一些觀念，再回到文件中的基本概念，並附上相關連結。</p>
+<p>通常情況下，你可能會在閱讀文件、動手實作中交替著切換直到你了解些什麼。</p>
+<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>在開始前，如果你像我當初一樣，是個初次從 HTML&#x2F;CSS&#x2F;JavaScript 學習過來的小白，對於面前的一堆工具的技術名詞，只有頭昏的感覺。</p>
+<p>那麼我們來思考一件事：</p>
+<p>現在的我們想試圖理解，我們編寫的 React 專案是如何被『建構』出來，且得以運行於瀏覽器。</p>
+<p>但讓我們換個方向思考：</p>
+<p>什麼樣類型的檔案，得以運行於瀏覽器環境？恩⋯⋯不就是 HTML、CSS、JavaScript！？</p>
+<p>至此，我們得到了某些線索：</p>
+<p>『打包工具（Bundler），最終必須生成出 HTML、CSS、JavaScript 這類的檔案，網頁才得以運行，對吧？』。</p>
+<p>有了這樣的切入點後，我們就可以開始學習 Webpack 了！</p>
+<blockquote>
+<p>在 2022 的今天，除了 Webpack 也存在著其他前端的建構工具，諸如：esbuild、parcel、rollup 等。</p>
+</blockquote>
+<h2 id="建構（Build）"><a href="#建構（Build）" class="headerlink" title="建構（Build）"></a>建構（Build）</h2><p>在開始進入正題前，我們先感受下『建構 build』的結果，或是稱作『打包 bundle』的結果。</p>
+<blockquote>
+<p>這邊都是用 React 來舉例，但你要知道的是 Webpack 不單只可以使用於 React 專案。</p>
+</blockquote>
+<p>如我們猜測一樣，Webpack 會將我們的 React 專案『建構』出 HTML、CSS、JavaScript 檔案，這邊你只需要理解我們模組化的多個檔案，已經被『打包』也就是揉成一團，以可以運行於瀏覽器的形式重新出現了。</p>
+<blockquote>
+<p>CSS 的部分可能會被處理在 JavaScript 檔案中，而沒有出現；如果你遇到這樣的問題，很正常。</p>
+</blockquote>
+<p>接著如果你要進行『網站部署』，你只需要找有提供『靜態網站』建置服務的服務商即可。你可能會選擇 AWS S3、或是 GitHub Page 來實作，這些服務都有一定的免費使用量，讓你進行『免費 Free』的建置。</p>
+<p>至此，當初的我仍然感覺到有些違和感。如果你也是從 PHP 這類使用 SSR 製作網頁過來的話，可能也會有同樣的感覺。</p>
+<blockquote>
+<p>SSR 全稱 Server-Side Rendering</p>
+</blockquote>
+<p>怎麼說呢？就是比起正常的伺服器運作，使用靜態網站建構的 React 應用，似乎哪簡單了點？</p>
+<p>恩⋯⋯的確不止如此，Webpack 為我們做的事情其實更多，讓我們稍微深入『打包』這件事，究竟打包了什麼東西？</p>
+<blockquote>
+<p>你可以參考文件獲得更多訊息：<a target="_blank" rel="noopener" href="https://webpack.js.org/concepts/manifest/">Webpack: Manifest</a></p>
+</blockquote>
+<p>一般情況下，會有三件東西被打包進最終的結果：</p>
+<ul>
+<li>你寫的 Code</li>
+<li>第三方套件</li>
+<li>Webpack Runtime 和 Manifest</li>
+</ul>
+<p>而 Webpack Runtime 就是，我們感到違和感的地方。這是 Webpack 替我們實作的機制，正常情況下我們感受不到他。</p>
+<p>使用者請求我們的網站時，Runtime 會於客戶端中（也就是瀏覽器中）運行起來，依據使用者的行為，於瀏覽器中載入相對應的模組（你可以理解成頁面）。</p>
+<blockquote>
+<p>舉例來說，當你今天使用 lazy loading 分離了『網站的主頁』和『商品頁』，在使用者訪問主頁時，Runtime 並不會為我們向靜態伺服器請求『商品頁』相關的代碼；而是在使用者點擊相關路由後，Runtime 才進行請求，以此加快網頁載入速度、減少流量傳輸。</p>
+</blockquote>
+<p>所以，原理上仍相同，對於 前後端整合在一起的網站（ex. PHP）來說，『路由』是被實現於後端（伺服器端），依據前端（客戶端）的請求回傳特定的資源；而像 前後端分離（ex. React）這類的專案，『路由』則是被實現於前端（瀏覽器中），再依據使用者的行為，向『靜態伺服器』請求新的頁面，或是向『後端伺服器』請求特定的資料。</p>
+<blockquote>
+<p>前後端分離的專案，後端也有自己的路由</p>
+</blockquote>
+<p>至此，我們對於整個 React 專案，從『建構 Build』或者稱作『打包 Bundle』到『部署 Deploy』皆有了概觀的認識了。</p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>Webpack 打包工具有著幾項基本概念：</p>
+<ul>
+<li>Entry</li>
+<li>Output</li>
+<li>Loaders</li>
+<li>Plugins</li>
+<li>Mode</li>
+<li>Browser Compatibility</li>
+<li>Environment</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://webpack.js.org/concepts/">官方文件</a>有著非常詳盡的解釋，以及範例。</p>
+<p>我們只會進行簡單的介紹，讓你不這麼陌生。在建構專案的大多數時候，你會不斷在 Webpack 官網提供的文件中，尋找可用的工具。</p>
+<h3 id="Entry-amp-Output"><a href="#Entry-amp-Output" class="headerlink" title="Entry &amp; Output"></a>Entry &amp; Output</h3><p>Entry 和 Output 屬性，用來設定整個『打包』過程的輸入和輸出。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// webpack.config.js</span><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = &#123;<br>    <span class="hljs-attr">entry</span>: &#123;<br>        <span class="hljs-attr">main</span>: <span class="hljs-string">&#x27;./src/index.tsx&#x27;</span><br>    &#125;,<br><br>    <span class="hljs-attr">output</span>: &#123;<br>        <span class="hljs-attr">path</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;build&#x27;</span>),<br>        <span class="hljs-attr">filename</span>: <span class="hljs-string">&#x27;static/js/[name].[contenthash].bundle.js&#x27;</span>,<br>        <span class="hljs-attr">publicPath</span>: <span class="hljs-string">&#x27;/&#x27;</span>,<br>        <span class="hljs-attr">clean</span>: <span class="hljs-literal">true</span>,<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>Entry：可以接受多可打包入口（你的應用程式入口），Webpack 會從這個檔案開始分析檔案間的依賴性，並進行打包。</li>
+<li>Output：設定打包結果檔案，輸出的位置、名稱、方式。此處的 <code>[name]</code> 和 <code>[contenthash]</code> 是會被替換的變數。在此例中，<code>[name]</code> 會被替換成 <code>main</code>，而 <code>[contenthash]</code> 會被替換成，依檔名和內容計算出來的 hash 值。</li>
+</ul>
+<blockquote>
+<p>更多關於 <a target="_blank" rel="noopener" href="https://webpack.js.org/configuration/entry-context/">entry</a> 和 <a target="_blank" rel="noopener" href="https://webpack.js.org/configuration/output/">output</a> 內容</p>
+</blockquote>
+<h3 id="Loaders-amp-Plugins"><a href="#Loaders-amp-Plugins" class="headerlink" title="Loaders &amp; Plugins"></a>Loaders &amp; Plugins</h3><p>Loaders 和 Plugins 大概是最常用到的屬性。</p>
+<p>在預設情況下 Webpack 只能讀取 JavaScript 和 JSON 檔案；然而，在專案中有著各種類型的檔案等著我們匯入。</p>
+<p>因此，我們必須借助各種各樣的 Loader 來轉譯這類型的檔案，使其成為 Webpack 能夠讀取的合法模塊。</p>
+<ul>
+<li><p>Loader：通常由第三方社群維護，用於轉換不同類型的模塊。在實際得使用上，Loader 像是 Webpack 與其他工具整合的橋樑。</p>
+<p>  舉例來說：我們可以使用 Babel 工具單獨來編譯 JSX 語法、轉換出 ES5 語法；但是要將工具整合進 Webpack 的打包流程中時，我們就必須使用 <code>babel-loader</code> 這個第三方工具來完成。</p>
+<p>  值得注意得是，真正進行 JSX 語法⋯⋯等編譯得仍是 Babel 工具，我們一樣可以藉由撰寫 <code>babel.config.json</code> 設定檔來，改變 Babel 的行為。（<code>babel-loader</code> 也有提供 <code>options</code> 屬性給我們進行設定，使用哪種方式取決開發人員）</p>
+<blockquote>
+<p>Webpack 官方有列出相關的 <a target="_blank" rel="noopener" href="https://webpack.js.org/loaders/">Loader 清單</a></p>
+</blockquote>
+<p>  在實際設定檔的編寫上，loader 會被定義於 <code>module.rules</code> 屬性中。</p>
+<ul>
+<li><code>test</code>：定義哪些類型的檔案需要進行處理</li>
+<li><code>use</code>：定義由哪些 loader 來處理。可以注意到的是 <code>use</code> 接收一個數組，而 loader 實際處理的順序是由右至左，表示越需要優先處理的 loader 要擺越後面。</li>
+</ul>
+<blockquote>
+<p>觀察 CSS 的 Loader，模塊被轉換的順序是：<code>postcss-loader</code> &gt; <code>css-loader</code> &gt; <code>MiniCssExtractPlugin.loader</code></p>
+</blockquote>
+<blockquote>
+<p>在 Webpack 5 中，對於引入圖片、影片、字型，使用內建的 Asset Module 模組進行處理即可，不需要在像過去額外引入 loader，詳細請參考 <a target="_blank" rel="noopener" href="https://webpack.js.org/guides/asset-management/#loading-images">Webpack: Asset Management</a></p>
+</blockquote>
+<p>  讓我們看範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// webpack.config.js</span><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = &#123;<br>    <span class="hljs-attr">module</span>: &#123;<br>        <span class="hljs-attr">rules</span>: [<br>            <span class="hljs-comment">// JavaScript</span><br>            &#123;<br>                <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.m?jsx?$/i</span>,<br>                <span class="hljs-attr">exclude</span>: <span class="hljs-regexp">/node_modules/i</span>,<br>                <span class="hljs-attr">use</span>: [<span class="hljs-string">&#x27;babel-loader&#x27;</span>]<br>            &#125;,<br>            &#123;<br>                <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.m?tsx?$/i</span>,<br>                <span class="hljs-attr">exclude</span>: <span class="hljs-regexp">/node_modules/i</span>,<br>                <span class="hljs-attr">use</span>: [<span class="hljs-string">&#x27;ts-loader&#x27;</span>]<br>            &#125;,<br>            <span class="hljs-comment">// CSS</span><br>            &#123;<br>                <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.s?[ac]ss$/i</span>,<br>                <span class="hljs-attr">use</span>: [<span class="hljs-title class_">MiniCssExtractPlugin</span>.<span class="hljs-property">loader</span>, <span class="hljs-string">&#x27;css-loader&#x27;</span>, <span class="hljs-string">&#x27;postcss-loader&#x27;</span>]<br>            &#125;,<br>            <span class="hljs-comment">// Assets</span><br>            &#123;<br>                <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.(png|svg|jpg|jpeg|gif|mp4|pdf|mpg)$/i</span>,<br>                <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;asset/resource&#x27;</span>,<br>                <span class="hljs-attr">generator</span>: &#123;<br>                    <span class="hljs-attr">filename</span>: <span class="hljs-string">&#x27;static/media/[name][hash][ext][query]&#x27;</span><br>                &#125;<br>            &#125;,<br>            &#123;<br>                <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.(woff|woff2|eot|ttf|otf)$/i</span>,<br>                <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;asset/resource&#x27;</span>,<br>                <span class="hljs-attr">generator</span>: &#123;<br>                    <span class="hljs-attr">filename</span>: <span class="hljs-string">&#x27;static/font/[name][hash][ext][query]&#x27;</span><br>                &#125;<br>            &#125;<br>        ]<br>    &#125;,<br>&#125;<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>Plugin：其中有官方維護的，也有由第三方社群維護，用於處理更廣泛的任務，打包優化、資源管理、注入環境變量等。</p>
+<p>  和 Loader 一樣，官方同樣整理出了一份清單，介紹各種 Plugin 的使用。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://webpack.js.org/plugins/">Webpack: Plugins</a></p>
+</blockquote>
+<p>  Plugin 在使用上也是，需要時翻找文件一邊參考一邊設定即可。</p>
+<p>  快速介紹幾種常見的 Plugin </p>
+<ul>
+<li><code>HtmlWebpackPlugin</code>：用於處理、生成 HTML 檔，來服務打包的結果（.js）</li>
+<li><code>MiniCssExtractPlugin</code>：用於抽離 CSS 代碼成單獨的檔案</li>
+<li><code>CssMinimizerPlugin</code>：（優化）最小化 CSS 代碼</li>
+<li><code>TerserPlugin</code>：（優化）最小化 JS 代碼</li>
+<li><code>BundleAnalyzerPlugin</code>：（優化）分析打包結果</li>
+</ul>
+<p>  讓我們看範例：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// webpack.config.js</span><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = &#123;<br>    <span class="hljs-attr">plugins</span>: [<br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">HtmlWebpackPlugin</span>(&#123;<br>            <span class="hljs-attr">template</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;public/index.html&#x27;</span>),<br>            <span class="hljs-attr">favicon</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;public/favicon.png&#x27;</span>),<br>        &#125;),<br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">MiniCssExtractPlugin</span>(&#123;<br>            <span class="hljs-attr">filename</span>: <span class="hljs-string">&#x27;static/css/[name].[contenthash].css&#x27;</span>,<br>            <span class="hljs-attr">chunkFilename</span>: <span class="hljs-string">&#x27;static/css/[id].[contenthash].css&#x27;</span>,<br>        &#125;)<br>    ],<br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>要手動自行編寫 Webpack 設定檔，是一件繁瑣的事情。在起步的開始，會需要看一堆 Loader、Plugin、和其他工具的文件，釐清每一個工具實際負責處理哪個部分，然後進行安裝。</p>
+<p>建議從小專案開始，一次整合一種工具，一段時間後會開始了解每種工具的職責。希望本文章能為你學習 Webpack 5 達到引導的效果。</p>
+<p>最後附上自己使用中的設定檔，以供參考：</p>
+<details>
+<summary>package.json</summary>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-comment">// package.json</span><br><span class="hljs-punctuation">&#123;</span><br>    ...<br>    <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br>        <span class="hljs-attr">&quot;start&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;webpack s --env mode=dev -c ./webpack.dev.js&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;build&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;webpack --env mode=prod -c ./webpack.prod.js&quot;</span><span class="hljs-punctuation">,</span><br>        <span class="hljs-attr">&quot;prod&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http-server --port 3000 -P http://localhost:3000? ./build&quot;</span><span class="hljs-punctuation">,</span><br>    <span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br>    ...<br><span class="hljs-punctuation">&#125;</span><br></code></pre></td></tr></table></figure>
+
+</details>
+
+
+<details>
+<summary>webpack.common.js</summary>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-comment">// webpack.common.js</span><br><span class="hljs-keyword">const</span> <span class="hljs-title class_">HtmlWebpackPlugin</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;html-webpack-plugin&#x27;</span>);<br><span class="hljs-keyword">const</span> <span class="hljs-title class_">MiniCssExtractPlugin</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;mini-css-extract-plugin&#x27;</span>);<br><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;path&#x27;</span>);<br><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = &#123;<br>    <span class="hljs-attr">entry</span>: &#123;<br>        <span class="hljs-attr">main</span>: <span class="hljs-string">&#x27;./src/index.tsx&#x27;</span><br>    &#125;,<br><br>    <span class="hljs-attr">plugins</span>: [<br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">HtmlWebpackPlugin</span>(&#123;<br>            <span class="hljs-attr">template</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;public/index.html&#x27;</span>),<br>            <span class="hljs-attr">favicon</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;public/favicon.png&#x27;</span>),<br>        &#125;),<br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">MiniCssExtractPlugin</span>(&#123;<br>            <span class="hljs-attr">filename</span>: <span class="hljs-string">&#x27;static/css/[name].[contenthash].css&#x27;</span>,<br>            <span class="hljs-attr">chunkFilename</span>: <span class="hljs-string">&#x27;static/css/[id].[contenthash].css&#x27;</span>,<br>        &#125;)<br>    ],<br><br><br>    <span class="hljs-attr">module</span>: &#123;<br>        <span class="hljs-attr">rules</span>: [<br>            <span class="hljs-comment">// JavaScript</span><br>            &#123;<br>                <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.m?jsx?$/i</span>,<br>                <span class="hljs-attr">exclude</span>: <span class="hljs-regexp">/node_modules/i</span>,<br>                <span class="hljs-attr">use</span>: [<span class="hljs-string">&#x27;babel-loader&#x27;</span>]<br>            &#125;,<br>            &#123;<br>                <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.m?tsx?$/i</span>,<br>                <span class="hljs-attr">exclude</span>: <span class="hljs-regexp">/node_modules/i</span>,<br>                <span class="hljs-attr">use</span>: [<span class="hljs-string">&#x27;ts-loader&#x27;</span>]<br>            &#125;,<br>            <span class="hljs-comment">// CSS</span><br>            &#123;<br>                <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.s?[ac]ss$/i</span>,<br>                <span class="hljs-attr">use</span>: [<span class="hljs-title class_">MiniCssExtractPlugin</span>.<span class="hljs-property">loader</span>, <span class="hljs-string">&#x27;css-loader&#x27;</span>, <span class="hljs-string">&#x27;postcss-loader&#x27;</span>]<br>            &#125;,<br>            <span class="hljs-comment">// Assets</span><br>            &#123;<br>                <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.(png|svg|jpg|jpeg|gif|mp4|pdf|mpg)$/i</span>,<br>                <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;asset/resource&#x27;</span>,<br>                <span class="hljs-attr">generator</span>: &#123;<br>                    <span class="hljs-attr">filename</span>: <span class="hljs-string">&#x27;static/media/[name][hash][ext][query]&#x27;</span><br>                &#125;<br>            &#125;,<br>            &#123;<br>                <span class="hljs-attr">test</span>: <span class="hljs-regexp">/\.(woff|woff2|eot|ttf|otf)$/i</span>,<br>                <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;asset/resource&#x27;</span>,<br>                <span class="hljs-attr">generator</span>: &#123;<br>                    <span class="hljs-attr">filename</span>: <span class="hljs-string">&#x27;static/font/[name][hash][ext][query]&#x27;</span><br>                &#125;<br>            &#125;<br>        ]<br>    &#125;,<br><br>    <span class="hljs-attr">resolve</span>: &#123;<br>        <span class="hljs-attr">alias</span>: &#123;<br>            <span class="hljs-attr">components</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;src/components&#x27;</span>),<br>            <span class="hljs-attr">hooks</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&quot;src/hooks&quot;</span>),<br>            <span class="hljs-attr">pages</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&quot;src/pages&quot;</span>),<br>            <span class="hljs-attr">utils</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&quot;src/utils&quot;</span>),<br>            <span class="hljs-attr">styles</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&quot;src/styles&quot;</span>),<br>            <span class="hljs-attr">images</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&quot;src/images&quot;</span>),<br>            <span class="hljs-attr">contexts</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;src/contexts&#x27;</span>),<br>            <span class="hljs-attr">store</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;src/store&#x27;</span>),<br>            <span class="hljs-attr">api</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;src/api&#x27;</span>),<br>            <span class="hljs-attr">mocks</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;src/mocks&#x27;</span>)<br>        &#125;,<br>        <span class="hljs-attr">extensions</span>: [<span class="hljs-string">&#x27;.tsx&#x27;</span>, <span class="hljs-string">&#x27;.ts&#x27;</span>, <span class="hljs-string">&#x27;.js&#x27;</span>]<br>    &#125;,<br><br>    <span class="hljs-attr">output</span>: &#123;<br>        <span class="hljs-attr">path</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;build&#x27;</span>),<br>        <span class="hljs-attr">filename</span>: <span class="hljs-string">&#x27;static/js/[name].[contenthash].bundle.js&#x27;</span>,<br>        <span class="hljs-attr">publicPath</span>: <span class="hljs-string">&#x27;/&#x27;</span>,<br>        <span class="hljs-attr">clean</span>: <span class="hljs-literal">true</span>,<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+</details>
+
+<details>
+<summary>webpack.dev.js</summary>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> &#123; merge &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;webpack-merge&#x27;</span>);<br><span class="hljs-keyword">const</span> common = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./webpack.common&#x27;</span>);<br><span class="hljs-keyword">const</span> <span class="hljs-title class_">Dotenv</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;dotenv-webpack&#x27;</span>);<br><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;path&#x27;</span>);<br><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-function">(<span class="hljs-params">env</span>) =&gt;</span> &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;env :&gt;&gt; &#x27;</span>, env);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-title function_">merge</span>(common, &#123;<br>        <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;development&#x27;</span>,<br><br>        <span class="hljs-attr">plugins</span>: [<br>            <span class="hljs-keyword">new</span> <span class="hljs-title class_">Dotenv</span>(&#123;<br>                <span class="hljs-attr">path</span>: <span class="hljs-string">`./.env.<span class="hljs-subst">$&#123;env.mode&#125;</span>`</span><br>            &#125;)<br>        ],<br><br>        <span class="hljs-attr">output</span>: &#123;<br>            <span class="hljs-attr">filename</span>: <span class="hljs-string">&#x27;static/js/[name].bundle.js&#x27;</span>,<br>            <span class="hljs-attr">path</span>: path.<span class="hljs-title function_">resolve</span>(__dirname, <span class="hljs-string">&#x27;build&#x27;</span>),<br>            <span class="hljs-attr">publicPath</span>: <span class="hljs-string">&#x27;/&#x27;</span>,<br>            <span class="hljs-attr">clean</span>: <span class="hljs-literal">true</span>,<br>        &#125;,<br><br>        <span class="hljs-attr">devtool</span>: <span class="hljs-string">&#x27;source-map&#x27;</span>,<br><br>        <span class="hljs-attr">devServer</span>: &#123;<br>            <span class="hljs-attr">port</span>: <span class="hljs-number">3000</span>,<br>            <span class="hljs-attr">compress</span>: <span class="hljs-literal">true</span>,<br>            <span class="hljs-attr">historyApiFallback</span>: &#123;<br>                <span class="hljs-attr">disableDotRule</span>: <span class="hljs-literal">true</span> <span class="hljs-comment">// for using dot in url path</span><br>            &#125;, <span class="hljs-comment">// redirect 404 to index.html</span><br>            <span class="hljs-attr">headers</span>: &#123;<br>                <span class="hljs-comment">// for google-sign-in button popup mode.</span><br>                <span class="hljs-string">&#x27;Cross-Origin-Opener-Policy&#x27;</span>: <span class="hljs-string">&#x27;same-origin-allow-popups&#x27;</span>,<br>                <span class="hljs-comment">// &#x27;Cross-Origin-Opener-Policy&#x27;: &#x27;same-origin&#x27;,</span><br>                <span class="hljs-comment">// &#x27;Cross-Origin-Embedder-Policy&#x27;: &#x27;require-corp&#x27;</span><br>            &#125;<br>        &#125;<br>    &#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+</details>
+
+<details>
+<summary>webpack.prod.js</summary>
+
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">const</span> &#123; merge &#125; = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;webpack-merge&#x27;</span>);<br><span class="hljs-keyword">const</span> common = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;./webpack.common&#x27;</span>);<br><span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;path&#x27;</span>);<br><span class="hljs-keyword">const</span> <span class="hljs-title class_">Dotenv</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;dotenv-webpack&#x27;</span>);<br><span class="hljs-keyword">const</span> <span class="hljs-title class_">CssMinimizerPlugin</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;css-minimizer-webpack-plugin&#x27;</span>);<br><span class="hljs-keyword">const</span> <span class="hljs-title class_">TerserPlugin</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;terser-webpack-plugin&#x27;</span>);<br><span class="hljs-keyword">const</span> <span class="hljs-title class_">BundleAnalyzerPlugin</span> = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;webpack-bundle-analyzer&#x27;</span>).<span class="hljs-property">BundleAnalyzerPlugin</span>;<br><br><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = <span class="hljs-function">(<span class="hljs-params">env</span>) =&gt;</span> &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;env :&gt;&gt; &#x27;</span>, env);<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-title function_">merge</span>(common, &#123;<br>        <span class="hljs-attr">mode</span>: <span class="hljs-string">&#x27;production&#x27;</span>,<br>        <span class="hljs-attr">plugins</span>: [<br>            <span class="hljs-keyword">new</span> <span class="hljs-title class_">Dotenv</span>(&#123;<br>                <span class="hljs-attr">path</span>: <span class="hljs-string">`./.env.<span class="hljs-subst">$&#123;env.mode&#125;</span>`</span><br>            &#125;),<br>            <span class="hljs-keyword">new</span> <span class="hljs-title class_">BundleAnalyzerPlugin</span>(),<br>        ],<br><br>        <span class="hljs-attr">optimization</span>: &#123;<br>            <span class="hljs-attr">minimize</span>: <span class="hljs-literal">true</span>,<br>            <span class="hljs-attr">minimizer</span>: [<span class="hljs-keyword">new</span> <span class="hljs-title class_">CssMinimizerPlugin</span>(), <span class="hljs-keyword">new</span> <span class="hljs-title class_">TerserPlugin</span>(&#123; <span class="hljs-attr">parallel</span>: <span class="hljs-literal">true</span> &#125;)],<br>            <span class="hljs-attr">splitChunks</span>: &#123;<br>                <span class="hljs-attr">cacheGroups</span>: &#123;<br>                    <span class="hljs-attr">react</span>: &#123;<br>                        <span class="hljs-attr">test</span>: <span class="hljs-regexp">/[\\/]node_modules[\\/](react|react-dom|react-router-dom)[\\/]/</span>,<br>                        <span class="hljs-attr">chunks</span>: <span class="hljs-string">&#x27;all&#x27;</span>,<br>                        <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;vendor~react&#x27;</span>,<br>                        <span class="hljs-attr">enforce</span>: <span class="hljs-literal">true</span>,<br>                    &#125;<br>                &#125;<br>            &#125;<br><br>        &#125;<br>    &#125;);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+</details>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/webpack-react-vue-babel-bundler/">#webpack, react, vue, babel, bundler</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>懵懂 Webpack 5 (React)</div>
+      <div>http://example.com/2022/12/26/懵懂-Webpack-5-React/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Chen Po Yu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>December 26, 2022</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/01/13/%E9%97%9C%E6%96%BC-JS-%E6%A8%A1%E7%B5%84%E5%8C%96%EF%BC%9ACMJ-AMD-CMD-UMD-ESM-IIFE/" title="關於 JS 模組化：CMJ, AMD, CMD, UMD, ESM, IIFE">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">關於 JS 模組化：CMJ, AMD, CMD, UMD, ESM, IIFE</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/12/18/Google-%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%85%A5-JavaScript-Node-js/" title="Google 第三方登入(JavaScript + Node.js)">
+                        <span class="hidden-mobile">Google 第三方登入(JavaScript + Node.js)</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

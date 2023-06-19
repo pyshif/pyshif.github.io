@@ -1,0 +1,829 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fish-favicon.png">
+  <link rel="icon" href="/img/fish-favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Chen Po Yu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言在 JavaScript 世界起源上（原型鏈）中，我們已經介紹完原型鏈的基本觀念 有了基本的認識後，在本章我們將實際建構『原型鏈』並且實作『函式 function』和『語法糖 class』兩種方式 實際上使用 class 來創建物件，和傳統使用『函式』，仍有些微的差異，並且 class 還擁有些擴展的性質  推薦閱讀 Class basic syntax | JavaScript.info">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript 世界起源下（原型鏈）">
+<meta property="og:url" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/index.html">
+<meta property="og:site_name" content="pyshif blog">
+<meta property="og:description" content="前言在 JavaScript 世界起源上（原型鏈）中，我們已經介紹完原型鏈的基本觀念 有了基本的認識後，在本章我們將實際建構『原型鏈』並且實作『函式 function』和『語法糖 class』兩種方式 實際上使用 class 來創建物件，和傳統使用『函式』，仍有些微的差異，並且 class 還擁有些擴展的性質  推薦閱讀 Class basic syntax | JavaScript.info">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/constructor.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/prototype.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/static.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-constructor.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-constructor-mind.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-instance.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-instance-mind.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-replace.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-replace-mind.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-link.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-link-mind.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-create.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-create-mind.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-class.png">
+<meta property="og:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-class-mind.png">
+<meta property="article:published_time" content="2022-04-21T03:51:04.000Z">
+<meta property="article:modified_time" content="2023-06-19T09:38:54.477Z">
+<meta property="article:author" content="Chen Po Yu">
+<meta property="article:tag" content="javascript, class, prototye">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/constructor.png">
+  
+  
+  
+    <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-LG5KBKG5S0"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date());
+gtag("config", "G-LG5KBKG5S0"); </script>
+  
+  <title>JavaScript 世界起源下（原型鏈） - pyshif blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  <link rel="stylesheet" href="/css/about-avatar.css" />
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Web Learning</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/your-advice/">
+                <i class="iconfont icon-pen"></i>
+                Your Advice
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JavaScript 世界起源下（原型鏈）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-04-21 03:51" pubdate>
+          April 21, 2022 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          10k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          87 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">JavaScript 世界起源下（原型鏈）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在 <a href="/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/">JavaScript 世界起源上（原型鏈）</a>中，我們已經介紹完原型鏈的基本觀念</p>
+<p>有了基本的認識後，在本章我們將實際建構『原型鏈』並且實作『函式 function』和『語法糖 class』兩種方式</p>
+<p>實際上使用 <code>class</code> 來創建物件，和傳統使用『函式』，仍有些微的差異，並且 <code>class</code> 還擁有些擴展的性質</p>
+<blockquote>
+<p>推薦閱讀 <a target="_blank" rel="noopener" href="https://javascript.info/class">Class basic syntax | JavaScript.info</a></p>
+</blockquote>
+<p>那麼，讓我們分別從幾個角度來比較『傳統使用函式』和『現在使用 class』的差異</p>
+<ul>
+<li>建構式</li>
+<li>建構原型</li>
+<li>原型繼承</li>
+</ul>
+<blockquote>
+<p>如果忘記 <code>new</code> 運算子究竟做了哪些工作的，可以回顧下『JavaScript 世界起源上（原型鏈）』</p>
+</blockquote>
+<h2 id="建構式-constructor"><a href="#建構式-constructor" class="headerlink" title="建構式 constructor"></a>建構式 constructor</h2><p><strong>function</strong></p>
+<ul>
+<li>宣告一個函式，命名習慣以大寫字母開頭（表示建構式）</li>
+<li>使用 <code>this</code> 關鍵字來為物件添加屬性、方法</li>
+</ul>
+<p><strong>class</strong></p>
+<ul>
+<li>使用 <code>class</code> 關鍵字，宣告類（語法糖）</li>
+<li>定義 <code>constructor</code> 函式（建構式）</li>
+</ul>
+<p><a href="constructor.js">constructor.js</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// 1</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">User</span>(<span class="hljs-params">name, age</span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">age</span> = age;<br>&#125;<br><br><span class="hljs-comment">// 2</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">CUser</span> &#123;<br>    <span class="hljs-title function_">constructor</span>(<span class="hljs-params">name, age</span>) &#123;<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name;<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-property">age</span> = age;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">const</span> user = <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>(<span class="hljs-string">&#x27;Liz&#x27;</span>, <span class="hljs-number">6</span>);<br><span class="hljs-keyword">const</span> cUser = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CUser</span>(<span class="hljs-string">&#x27;CLiz&#x27;</span>, <span class="hljs-number">6</span>);<br><br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;user :&gt;&gt; &#x27;</span>, user);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;cUser :&gt;&gt; &#x27;</span>, cUser);<br></code></pre></td></tr></table></figure>
+
+<p>讓我們看下在瀏覽器中（Safari 15.1）的執行結果</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/constructor.png" srcset="/img/loading.gif" lazyload alt="constructor.png"></p>
+<p>我們可以觀察到，2 種方式創建出來的物件</p>
+<ul>
+<li>都擁有自己的屬性 <code>name</code> 和 <code>age</code></li>
+<li>分別繼承了原型 <code>User</code> 和 <code>CUser</code></li>
+<li>原型 <code>User</code> 和 <code>CUser</code> 都擁有 <code>constructor</code> 屬性指向建構式</li>
+<li>原型 <code>User</code> 和 <code>CUser</code> 都繼承自 Object 原型（<code>Object.prototype</code>）</li>
+</ul>
+<h2 id="建構原型-prototype"><a href="#建構原型-prototype" class="headerlink" title="建構原型 prototype"></a>建構原型 prototype</h2><p><strong>function</strong></p>
+<ul>
+<li>添加『原型屬性』，直接操作 <code>&lt;constructor&gt;.prototype</code> 即可</li>
+<li>添加『原型方法』，直接操作 <code>&lt;constructor&gt;.prototype</code> 即可</li>
+</ul>
+<p><strong>class</strong></p>
+<ul>
+<li>添加『原型屬性』，操作 <code>&lt;constructor&gt;.prototype</code></li>
+<li>添加『原型方法』，在 <code>class</code> 區塊當中宣告函式</li>
+</ul>
+<blockquote>
+<p>大多數時候，我們較少為原型添加屬性</p>
+</blockquote>
+<p><a href="prototype.js">prototype.js</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// 1</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">User</span>(<span class="hljs-params">name, age</span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">age</span> = age;<br>&#125;<br><br><span class="hljs-comment">// 為原型添加屬性</span><br><span class="hljs-title class_">User</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">lang</span> = <span class="hljs-string">&#x27;en&#x27;</span>;<br><br><span class="hljs-comment">// 為原型添加方法</span><br><span class="hljs-title class_">User</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">hi</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`My name is <span class="hljs-subst">$&#123;<span class="hljs-variable language_">this</span>.name&#125;</span>`</span>);<br>&#125;<br><br><span class="hljs-comment">// 靜態屬性、方法</span><br><span class="hljs-title class_">User</span>.<span class="hljs-property">location</span> = <span class="hljs-string">&#x27;USA&#x27;</span>;<br><span class="hljs-title class_">User</span>.<span class="hljs-property">displayLocation</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this.location :&gt;&gt; &#x27;</span>, <span class="hljs-variable language_">this</span>.<span class="hljs-property">location</span>);<br>&#125;<br><br><br><span class="hljs-comment">// 2</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">CUser</span> &#123;<br>    <span class="hljs-title function_">constructor</span>(<span class="hljs-params">name, age</span>) &#123;<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name;<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-property">age</span> = age;<br>    &#125;<br><br>    <span class="hljs-comment">// 為原型添加方法</span><br>    <span class="hljs-title function_">hi</span>(<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`My name is <span class="hljs-subst">$&#123;<span class="hljs-variable language_">this</span>.name&#125;</span>`</span>);<br>    &#125;<br><br>    <span class="hljs-comment">// 靜態屬性、方法</span><br>    <span class="hljs-keyword">static</span> location = <span class="hljs-string">&#x27;USA&#x27;</span>;<br>    <span class="hljs-keyword">static</span> <span class="hljs-title function_">displayLocation</span>(<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this.location :&gt;&gt; &#x27;</span>, <span class="hljs-variable language_">this</span>.<span class="hljs-property">location</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">// 為原型添加屬性</span><br><span class="hljs-title class_">CUser</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">lang</span> = <span class="hljs-string">&#x27;zh&#x27;</span>;<br><br><br><br><span class="hljs-keyword">const</span> user = <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>(<span class="hljs-string">&#x27;Liz&#x27;</span>, <span class="hljs-number">6</span>);<br><span class="hljs-keyword">const</span> cUser = <span class="hljs-keyword">new</span> <span class="hljs-title class_">CUser</span>(<span class="hljs-string">&#x27;CLiz&#x27;</span>, <span class="hljs-number">6</span>);<br><br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;user :&gt;&gt; &#x27;</span>, user);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;cUser :&gt;&gt; &#x27;</span>, cUser);<br></code></pre></td></tr></table></figure>
+
+<p>讓我們看下在瀏覽器中（Safari 15.1）的執行結果</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/prototype.png" srcset="/img/loading.gif" lazyload alt="prototype.png"></p>
+<p>我們可以觀察到，兩種方式都分別成功的為 <code>User</code> 和 <code>CUser</code> 原型添加了 <code>lang</code> 屬性、和 <code>hi()</code> 方法</p>
+<p>可以注意到的是我們增加了『靜態屬性、方法』，所謂的『靜態』指的是跟著 <code>User</code> 和 <code>CUser</code> 建構式物件本身</p>
+<blockquote>
+<p>靜態的屬性、方法，不存在於原型鏈當中；直接透過建構式物件訪問 ex. <code>User.location</code> or <code>CUser.displayLocation()</code></p>
+</blockquote>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/static.png" srcset="/img/loading.gif" lazyload alt="static.png"></p>
+<h2 id="原型繼承-Prototypal-Inheritance"><a href="#原型繼承-Prototypal-Inheritance" class="headerlink" title="原型繼承 Prototypal Inheritance"></a>原型繼承 Prototypal Inheritance</h2><p>談論 JS 的原型繼承，大概是許多新手頭痛的問題之一，包括當初的自己在內。</p>
+<p>首先，必須說 <code>class</code> 的出現其實解決了這樣一個的問題，我們只需要使用 <code>extends</code> 關鍵字即可讓 JS 幫助我們完成原型繼承的串連。</p>
+<p>但是求知慾旺盛的我們，卻沒有因此滿足，所以，下方我們會列舉常見的繼承方式，深入研究之間的差異</p>
+<p>在開始前，如果你曾學習過 OOP 相關的語言（ex. C++），也許你會很困惑，為什麼一個『繼承』也有這麼多方式？</p>
+<p>我想這是我給自己的答案，你可以參考下：</p>
+<p>『我們一再提及 JS 當中，只有物件 object 沒有 類 class 的概念，而在 JS 中取代 類 的繼承 inheritance 的機制，是所謂的原型繼承 prototypal inheritance』</p>
+<p>那麼，這跟多種繼承方式的現象有什麼關係？</p>
+<p>是因為『原型繼承的本質』</p>
+<p>『原型繼承，就像是有這麼一群 原型物件 存在。原型物件 除了儲存著需要共享的數據，同時也紀錄著 另一個原型物件，就像是串列 List 這樣的資料結構（鏈狀結構），一個接著一個，直到盡頭（指向 null）』</p>
+<p>而每當我們創建 新物件（instance，實例物件），我只需要將這個 物件 中紀錄原型的地方，存進 特定一個原型物件，那麼就可以共享到這個 原型物件 以上（包含）的原型鏈中的數據了』</p>
+<p>那麼重點來了，是誰在幫我們做這件事（連結原型鏈）？</p>
+<ul>
+<li>在傳統的方法中是 <code>new</code> 運算子 和 我們自己手動</li>
+<li>在現在的方法中是 <code>new</code> 運算子 和 <code>class</code> 中的 <code>extends</code> 語法</li>
+</ul>
+<p>這個答案不知道，會不會有人覺得奇怪，『手動』什麼意思？還可以『自己訂規則』？</p>
+<p>恩，就是這樣。我們可以『任意的操縱原型鏈』，只要我們想要，然而多數情況並不建議如此做</p>
+<p>關於這點，並沒有太深入的查詢資料，只能說這是 JavaScript 這個語言給予的『彈性』</p>
+<p>所以，出於這樣的原因，才會讓新手在查找資料時，找到各種各樣教學繼承的版本</p>
+<p>那麼，今天就來一一討論這些各種各樣的繼承方式，究竟背後的『原型，彼此是怎麼關聯的』</p>
+<p>由於這些方法沒有一個特定名子，所以會附上描述，而命名上會盡量簡潔</p>
+<h3 id="建構式"><a href="#建構式" class="headerlink" title="建構式"></a>建構式</h3><p>利用函式原型（<code>Function.prototype</code>）提供的 <code>call()</code> or <code>apply()</code> 方法達成</p>
+<blockquote>
+<p>在 子物件 當中呼叫 父物件 建構式</p>
+</blockquote>
+<p><a href="inherit-constructor.js">inherit-constructor.js</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// Animal 建構式（父物件）</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">Animal</span>(<span class="hljs-params">name</span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name;<br>&#125;<br><br><span class="hljs-comment">// Animal 原型</span><br><span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">talk</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Hi, my name is <span class="hljs-subst">$&#123;<span class="hljs-variable language_">this</span>.name&#125;</span>`</span>);<br>&#125;<br><br><span class="hljs-comment">// Rabit 建構式（子物件）</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">Rabit</span>(<span class="hljs-params">name, color</span>) &#123;<br>    <span class="hljs-title class_">Animal</span>.<span class="hljs-title function_">call</span>(<span class="hljs-variable language_">this</span>, name);<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">color</span> = color;<br>&#125;<br><br><span class="hljs-comment">// 創建 Rabit 實例</span><br><span class="hljs-keyword">const</span> rabit = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Rabit</span>(<span class="hljs-string">&#x27;Liz&#x27;</span>, <span class="hljs-string">&#x27;white&#x27;</span>);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit :&gt;&gt; &#x27;</span>, rabit);<br></code></pre></td></tr></table></figure>
+
+<p>讓我們在瀏覽器（Safari 15.1）中執行上述代碼</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-constructor.png" srcset="/img/loading.gif" lazyload alt="inherit-constructor"></p>
+<p>可以觀察到，這樣的方式的確可以使『物件實例』擁有 父物件建構式當中所定義的屬性，然而實際上並未達成『原型繼承』</p>
+<p>所以，我認為這樣的繼承方式並不完整</p>
+<p>讓我們將這樣的方式轉換成『心理模型』：</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-constructor-mind.png" srcset="/img/loading.gif" lazyload alt="inherit-constructor-mind.png"></p>
+<p>我們可以觀察到，兔子原型（<code>Rabit.prototype</code>）本該連結到 動物原型（<code>Animal.prototype</code>），但卻直接連回 物件原型（<code>Object.prototype</code>）了</p>
+<blockquote>
+<p>灰色虛線部分，為本應該連結的部分</p>
+</blockquote>
+<p>所以，很正常的 兔子實例 無法使用 動物原型 的 <code>talk()</code> 方法</p>
+<h3 id="實例"><a href="#實例" class="headerlink" title="實例"></a>實例</h3><p>創建一個 父物件 的『實例』，將其作為 子物件 『原型』</p>
+<p>讓我們看一下代碼：</p>
+<p><a href="inherit-instance.js">inherit-instance.js</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// Animal 建構式（父物件）</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">Animal</span>(<span class="hljs-params">name</span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name;<br>&#125;<br><br><span class="hljs-comment">// Animal 原型</span><br><span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">talk</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Hi, my name is <span class="hljs-subst">$&#123;<span class="hljs-variable language_">this</span>.name&#125;</span>`</span>);<br>&#125;<br><br><span class="hljs-comment">// Rabit 建構式（子物件）</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">Rabit</span>(<span class="hljs-params">name, color</span>) &#123;<br>    <span class="hljs-title class_">Animal</span>.<span class="hljs-title function_">call</span>(<span class="hljs-variable language_">this</span>, name);<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">color</span> = color;<br>&#125;<br><br><span class="hljs-comment">// 創建 父物件 的 實例物件 作為（取代）子物件的原型</span><br><span class="hljs-title class_">Rabit</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Animal</span>;<br><span class="hljs-comment">// 這種方式，如果不指定 constructor 則會指向 父物件建構式 Animal</span><br><span class="hljs-title class_">Rabit</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">constructor</span> = <span class="hljs-title class_">Rabit</span>;<br><br><span class="hljs-comment">// 創建 Rabit 實例</span><br><span class="hljs-keyword">const</span> rabit = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Rabit</span>(<span class="hljs-string">&#x27;Liz&#x27;</span>, <span class="hljs-string">&#x27;white&#x27;</span>);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit :&gt;&gt; &#x27;</span>, rabit);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit.__proto__ === Rabit.prototype :&gt;&gt; &#x27;</span>, rabit.<span class="hljs-property">__proto__</span> === <span class="hljs-title class_">Rabit</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>); <span class="hljs-comment">// true</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit.__proto__.__proto__ === Animal.prototype :&gt;&gt; &#x27;</span>, rabit.<span class="hljs-property">__proto__</span>.<span class="hljs-property">__proto__</span> === <span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>); <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure>
+
+<p>讓我們在瀏覽器（Safari 15.1）中，執行上述代碼</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-instance.png" srcset="/img/loading.gif" lazyload alt="inherit-instance"></p>
+<p>可以看見，我們創建出來的 <code>rabit</code> 實例物件，成功地串連起 兔子原型（<code>Rabit.prototype</code>）、動物原型（<code>Animal.prototype</code>）、物件原型（<code>Object.prototype</code>）</p>
+<p>為了更清楚的理解，讓我們將這樣的方式轉換成『心理模型』：</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-instance-mind.png" srcset="/img/loading.gif" lazyload alt="inherit-instance-mind.png"></p>
+<p>我們可以觀察到，兔子原型（<code>Rabit.prototype</code>）被 動物的實例物件（Animal instance）取代，而作為一個 實例 自然而然 可以訪問 原型（動物），因此整個『原型繼承』串連完成</p>
+<blockquote>
+<p>灰色虛線的兩端，是同一個物件（Animal 實例物件）</p>
+</blockquote>
+<p>至此，讓我們思考下這種方式存在什麼樣的問題</p>
+<p>可以看見，使用 實例物件 取代 原型物件，這樣的方式造成：『多出一份用不到的數據（實例）佔據原型物件（兔子）的位置』</p>
+<p>所以，如果忽略『多餘數據佔據空間的缺點』，這樣的方式『仍可以達成原型鏈的串接』</p>
+<h3 id="取代"><a href="#取代" class="headerlink" title="取代"></a>取代</h3><p>直接將 父物件 的『原型』作為 子物件 的『原型』取代</p>
+<p>讓我們看下代碼：</p>
+<p><a href="inherit-replace.js">inherit-replace</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// Animal 建構式（父物件）</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">Animal</span>(<span class="hljs-params">name</span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name;<br>&#125;<br><br><span class="hljs-comment">// Animal 原型</span><br><span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">talk</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Hi, my name is <span class="hljs-subst">$&#123;<span class="hljs-variable language_">this</span>.name&#125;</span>`</span>);<br>&#125;<br><br><span class="hljs-comment">// Rabit 建構式（子物件）</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">Rabit</span>(<span class="hljs-params">name, color</span>) &#123;<br>    <span class="hljs-title class_">Animal</span>.<span class="hljs-title function_">call</span>(<span class="hljs-variable language_">this</span>, name);<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">color</span> = color;<br>&#125;<br><br><span class="hljs-comment">// 直接將 父物件 的原型 取代 子物件 的原型</span><br><span class="hljs-title class_">Rabit</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span> = <span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>;<br><span class="hljs-comment">// 這種方式，如果不指定 constructor 則會指向 父物件建構式 Animal</span><br><span class="hljs-title class_">Rabit</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">constructor</span> = <span class="hljs-title class_">Rabit</span>;<br><br><span class="hljs-comment">// 創建 Rabit 實例</span><br><span class="hljs-keyword">const</span> rabit = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Rabit</span>(<span class="hljs-string">&#x27;Liz&#x27;</span>, <span class="hljs-string">&#x27;white&#x27;</span>);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit :&gt;&gt; &#x27;</span>, rabit);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit.__proto__ === Rabit.prototype :&gt;&gt; &#x27;</span>, rabit.<span class="hljs-property">__proto__</span> === <span class="hljs-title class_">Rabit</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>); <span class="hljs-comment">// true</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit.__proto__.__proto__ === Animal.prototype :&gt;&gt; &#x27;</span>, rabit.<span class="hljs-property">__proto__</span>.<span class="hljs-property">__proto__</span> === <span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>); <span class="hljs-comment">// false</span><br></code></pre></td></tr></table></figure>
+
+<p>讓我們在瀏覽器（Safari 15.1）中執行</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-replace.png" srcset="/img/loading.gif" lazyload alt="inherit-replace"></p>
+<p>這裡需要注意的是 log 中的 兔子原型（<code>Rabit Prototype</code>）實際上是 動物原型（<code>Animal Prototype</code>），從擁有 <code>talk()</code> 方法即可得知</p>
+<blockquote>
+<p>由於修改了 <code>Rabit.prototype.constructor = Rabit</code> 因此會有如上現象，如果不修改則會顯示 動物原型</p>
+</blockquote>
+<p>由於，原型的取代，使得原型鏈縮短，對於 <code>rabit</code> 實例來說，上方第二原型就回到 <code>Object.prototype</code>，所以我們 log 的結果為 <code>false</code></p>
+<p>為了更清楚的理解，讓我們將這樣的方式轉換成『心理模型』：</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-replace-mind.png" srcset="/img/loading.gif" lazyload alt="inherit-replace-mind.png"></p>
+<p>我們可以觀察到，兔子原型（<code>Rabit.prototype</code>）被 動物原型（<code>Animal.prototype</code>）取代，因此整個『原型繼承』自然而然串接完成</p>
+<blockquote>
+<p>灰色虛線的兩端，是相同一個物件（動物原型 <code>Animal.prototype</code>）</p>
+</blockquote>
+<p>至此，讓我們思考下這種方式的優劣</p>
+<p>原型的取代，讓整個原型鏈長度縮短，在原型鏈的訪問上效率更好</p>
+<p>然而，顯而易見，兔子原型 不是一個獨立的物件（不像上方『實例』的方法），因此，所有對 兔子原型 的修改，實際上也影響著 動物原型 </p>
+<p>所以，如果今天 子物件的原型 不會被更動，那麼也許可以使用這樣的方式來『達成原型鏈的串接』</p>
+<h3 id="連結"><a href="#連結" class="headerlink" title="連結"></a>連結</h3><p>將 子物件 的原型，和 父物件 的原型『連結』(意思就是 子物件的原型物件 的原型是 父物件的原型物件)</p>
+<p>讓我們看一下代碼：</p>
+<p><a href="inherit-link.js">inherit-link</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// Animal 建構式（父物件）</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">Animal</span>(<span class="hljs-params">name</span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name;<br>&#125;<br><br><span class="hljs-comment">// Animal 原型</span><br><span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">talk</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Hi, my name is <span class="hljs-subst">$&#123;<span class="hljs-variable language_">this</span>.name&#125;</span>`</span>);<br>&#125;<br><br><span class="hljs-comment">// Rabit 建構式（子物件）</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">Rabit</span>(<span class="hljs-params">name, color</span>) &#123;<br>    <span class="hljs-title class_">Animal</span>.<span class="hljs-title function_">call</span>(<span class="hljs-variable language_">this</span>, name);<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">color</span> = color;<br>&#125;<br><br><span class="hljs-comment">// 將 Rabit 原型 連結 Animal 原型</span><br><span class="hljs-comment">// Rabit.prototype.__proto__ = Animal.prototype;</span><br><span class="hljs-comment">// OR</span><br><span class="hljs-title class_">Object</span>.<span class="hljs-title function_">setPrototypeOf</span>(<span class="hljs-title class_">Rabit</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>, <span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>);<br><br><span class="hljs-comment">// 創建 Rabit 實例</span><br><span class="hljs-keyword">const</span> rabit = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Rabit</span>(<span class="hljs-string">&#x27;Liz&#x27;</span>, <span class="hljs-string">&#x27;white&#x27;</span>);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit :&gt;&gt; &#x27;</span>, rabit);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit.__proto__ === Rabit.prototype :&gt;&gt; &#x27;</span>, rabit.<span class="hljs-property">__proto__</span> === <span class="hljs-title class_">Rabit</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>); <span class="hljs-comment">// true</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit.__proto__.__proto__ === Animal.prototype :&gt;&gt; &#x27;</span>, rabit.<span class="hljs-property">__proto__</span>.<span class="hljs-property">__proto__</span> === <span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>); <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure>
+
+<p>讓我們在瀏覽器（Safari 15.1）中執行上述代碼</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-link.png" srcset="/img/loading.gif" lazyload alt="inherit-link"></p>
+<p>這樣的方式，我們可以看到『原型鏈被完整的串接起來』。</p>
+<p>而值得注意的是，代碼中 2 種連結的方式，由於 MDN 文件建議不要直接訪問 <code>__proto__</code> 因此，我們使用 <code>Object.setPrototypeOf()</code> 取代，兩種都是設定『自身物件』在『原型鏈的上方』要連結著誰（object）</p>
+<p>為了更清楚的理解，讓我們將這樣的方式轉換成『心理模型』：</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-link-mind.png" srcset="/img/loading.gif" lazyload alt="inherit-link-mind.png"></p>
+<p>從心理模型中我們可以看到，兔子原型（<code>Rabit.prototype</code>）連接著 動物原型（<code>Animal.prototype</code>），完成『原型鏈的串接』</p>
+<h3 id="創建"><a href="#創建" class="headerlink" title="創建"></a>創建</h3><p>『創建』一個以 父物件 的原型為原型 的物件，將其賦值給 子物件的原型</p>
+<blockquote>
+<p>實際上，『連結』與『創建』和『class（後續會待到）』所構建出來的原型鏈是一模一樣的</p>
+</blockquote>
+<p>創建的過程，我們會借助 <code>Object.create()</code> 這個內建方法完成</p>
+<blockquote>
+<p><code>Object.create()</code> 接受一個 物件 參數，將其作為原型 創建出一個新物件</p>
+</blockquote>
+<p>讓我們看一下代碼：</p>
+<p><a href="inherit-create.js">inherit-create.js</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// Animal 建構式（父物件）</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">Animal</span>(<span class="hljs-params">name</span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name;<br>&#125;<br><br><span class="hljs-comment">// Animal 原型</span><br><span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">talk</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Hi, my name is <span class="hljs-subst">$&#123;<span class="hljs-variable language_">this</span>.name&#125;</span>`</span>);<br>&#125;<br><br><span class="hljs-comment">// Rabit 建構式（子物件）</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">Rabit</span>(<span class="hljs-params">name, color</span>) &#123;<br>    <span class="hljs-title class_">Animal</span>.<span class="hljs-title function_">call</span>(<span class="hljs-variable language_">this</span>, name);<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">color</span> = color;<br>&#125;<br><br><span class="hljs-title class_">Rabit</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span> = <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">create</span>(<span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>);<br><span class="hljs-title class_">Rabit</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">constructor</span> = <span class="hljs-title class_">Rabit</span>;<br><br><span class="hljs-comment">// 創建 Rabit 實例</span><br><span class="hljs-keyword">const</span> rabit = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Rabit</span>(<span class="hljs-string">&#x27;Liz&#x27;</span>, <span class="hljs-string">&#x27;white&#x27;</span>);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit :&gt;&gt; &#x27;</span>, rabit);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit.__proto__ === Rabit.prototype :&gt;&gt; &#x27;</span>, rabit.<span class="hljs-property">__proto__</span> === <span class="hljs-title class_">Rabit</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>); <span class="hljs-comment">// true</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit.__proto__.__proto__ === Animal.prototype :&gt;&gt; &#x27;</span>, rabit.<span class="hljs-property">__proto__</span>.<span class="hljs-property">__proto__</span> === <span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>); <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure>
+
+<p>讓我們在瀏覽器（Safari 15.1）執行這段代碼吧</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-create.png" srcset="/img/loading.gif" lazyload alt="inherit-create"></p>
+<p>我們可以看到，原型鏈被完整的串接起來，從 <code>rabit</code> 到 兔子原型（<code>Rabit.prototype</code>）再到 動物原型（<code>Animal.prototype</code>）和 物件原型（<code>Object.prototype</code>）</p>
+<p>這裡要注意的是，和前面提到的『實例』和『取代』方法一樣，要記得指定子物件原型的建構式（<code>Rabit.prototype.constructor = Rabit</code>），如果不指定的話，將會指向父物件原型的建構式（也就是 <code>Animal()</code>）</p>
+<p>同樣的，讓我們將這樣的方式轉換成『心理模型』：</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-create-mind.png" srcset="/img/loading.gif" lazyload alt="inherit-create-mind.png"></p>
+<p>從心理模型中我們可以看到，兔子原型（<code>Rabit.prototype</code>）連接著 動物原型（<code>Animal.prototype</code>），完成『原型鏈的串接』</p>
+<h3 id="class"><a href="#class" class="headerlink" title="class"></a><code>class</code></h3><p>使用內建語法 <code>class</code> 和 <code>extends</code> 來『繼承』『物件』</p>
+<p><a href="inherit-class.js">inherit-class.js</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// Animal 建構式（父物件）</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Animal</span> &#123;<br>    <span class="hljs-title function_">constructor</span>(<span class="hljs-params">name</span>) &#123;<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name;<br>    &#125;<br><br>    <span class="hljs-title function_">talk</span>(<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Hi, my nmae is <span class="hljs-subst">$&#123;<span class="hljs-variable language_">this</span>.name&#125;</span>`</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">// Rabit 建構式（子物件）</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Rabit</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_ inherited__">Animal</span> &#123;<br>    <span class="hljs-title function_">constructor</span>(<span class="hljs-params">name, color</span>) &#123;<br>        <span class="hljs-variable language_">super</span>(name);<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-property">cololr</span> = color;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">// 創建 Rabit 實例</span><br><span class="hljs-keyword">const</span> rabit = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Rabit</span>(<span class="hljs-string">&#x27;Liz&#x27;</span>, <span class="hljs-string">&#x27;white&#x27;</span>);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit :&gt;&gt; &#x27;</span>, rabit);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit.__proto__ === Rabit.prototype :&gt;&gt; &#x27;</span>, rabit.<span class="hljs-property">__proto__</span> === <span class="hljs-title class_">Rabit</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>); <span class="hljs-comment">// true</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rabit.__proto__.__proto__ === Animal.prototype :&gt;&gt; &#x27;</span>, rabit.<span class="hljs-property">__proto__</span>.<span class="hljs-property">__proto__</span> === <span class="hljs-title class_">Animal</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>); <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure>
+
+<p>讓我們在瀏覽器（Safari 15.1）中執行看看</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-class.png" srcset="/img/loading.gif" lazyload alt="inherit-class"></p>
+<p>可以看到使用 <code>extends</code> 繼承的方式，和『連結』與『創建』兩種方法一樣，有著相同的原型鏈結構</p>
+<blockquote>
+<p>注意，<code>class</code> 中宣告的函式是屬於原型的</p>
+</blockquote>
+<p>讓我們將這樣的方式轉換成『心理模型』：</p>
+<p><img src="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/inherit-class-mind.png" srcset="/img/loading.gif" lazyload alt="inherit-class-mind.png"></p>
+<p>從心理模型中我們可以看到，兔子原型（<code>Rabit.prototype</code>）連接著 動物原型（<code>Animal.prototype</code>），完成『原型鏈的串接』</p>
+<h2 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h2><p>至此，我們講述完了 6 種原型繼承方式『建構式、實例、取代、連結、創建、class』</p>
+<p>除了第一種『建構式』方式無法真正達成原型鏈的串接外，剩下 5 種都可以完成原型鏈的串連</p>
+<p>在這 5 種中，其中 3 種（連結、創建、class）所建構出的原型鏈結構又相同</p>
+<p>而這 3 種所建構出的原型鏈，也是自己覺得最貼近『原型繼承』這個概念的方法</p>
+<p>最後，做一個『原型繼承』重點整理</p>
+<ul>
+<li><strong>建構式</strong><br>  子物件建構式中，呼叫父物件建構式（可以取得父物件建構式定義的屬性、方法，但不能取得原型）</li>
+<li><strong>實例</strong><br>  以父物件 創建的實例，作為（取代）子物件的原型（<code>Rabit.prototype = new Animal()</code>）</li>
+<li><strong>取代</strong><br>  以父物件 的原型，作為（取代）子物件的原型（<code>Rabit.prototype = Animal.prototype</code>）</li>
+<li><strong>連結</strong><br>  將子物件 的原型，和 父物件 的原型 連結（<code>Object.setPrototypeOf(Rabit.prototype, Animal.prototype)</code>）</li>
+<li><strong>創建</strong><br>  創建一個以 父物件 的原型 為原型 的 物件，作為（取代）子物件的原型（<code>Rabit.prototype = Object.create(Animal.prototype)</code>）</li>
+<li><strong>class</strong><br>  使用 <code>extends</code> 關鍵字繼承 父物件</li>
+</ul>
+<h2 id="參考文件"><a href="#參考文件" class="headerlink" title="參考文件"></a>參考文件</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes">Classes - JavaScript | MDN</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf">Object.setPrototypeOf() - JavaScript | MDN</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create">Object.create() - JavaScript | MDN</a></li>
+<li><a target="_blank" rel="noopener" href="https://javascript.info/classes">Classes | JavaScript.info</a><br><a target="_blank" rel="noopener" href="https://hijiangtao.github.io/2018/06/17/Shapes-ICs/">JavaScript 引擎基礎：Shapes 和 InlineCaches</a><br><a target="_blank" rel="noopener" href="https://hijiangtao.github.io/2018/08/21/Prototypes/">JavaScript 引擎基礎：原型優化</a></li>
+<li><a target="_blank" rel="noopener" href="https://mathiasbynens.be/notes/prototypes">how modern JavaScript engines optimize property accesses</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.toptal.com/javascript/javascript-prototypes-scopes-and-performance-what-you-need-to-know">JavaScript Prototype Chains, Scope Chains and Performance: What You Need To Know</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/javascript-class-prototye/">#javascript, class, prototye</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JavaScript 世界起源下（原型鏈）</div>
+      <div>http://example.com/2022/04/21/JavaScript-世界起源下（原型鏈）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Chen Po Yu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>April 21, 2022</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/12/18/Google-%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%85%A5-JavaScript-Node-js/" title="Google 第三方登入(JavaScript + Node.js)">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Google 第三方登入(JavaScript + Node.js)</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/" title="JavaScript 世界起源上（原型鏈）">
+                        <span class="hidden-mobile">JavaScript 世界起源上（原型鏈）</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

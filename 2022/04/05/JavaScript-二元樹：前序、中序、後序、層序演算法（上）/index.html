@@ -1,0 +1,999 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fish-favicon.png">
+  <link rel="icon" href="/img/fish-favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Chen Po Yu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="本篇文章依照自己的理解和話，整理、延伸自Chiu CC 部落格 有關於樹的一系列以 C++ 實作的文章重點。 接下來簡單介紹下二元樹 Binary Tree，以及使用 JavaScript 實作出二元樹 4 種尋訪（前、中、後、層序），實作的過程會紀錄尋訪規則、資料結構、演算法設計，一直到建構代碼。 二元樹『介紹』所謂的二元樹 Binary Tree 即是除了具有原本樹 Tree 的性質外，再加上">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript 二元樹：前序、中序、後序、層序演算法（上）">
+<meta property="og:url" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/index.html">
+<meta property="og:site_name" content="pyshif blog">
+<meta property="og:description" content="本篇文章依照自己的理解和話，整理、延伸自Chiu CC 部落格 有關於樹的一系列以 C++ 實作的文章重點。 接下來簡單介紹下二元樹 Binary Tree，以及使用 JavaScript 實作出二元樹 4 種尋訪（前、中、後、層序），實作的過程會紀錄尋訪規則、資料結構、演算法設計，一直到建構代碼。 二元樹『介紹』所謂的二元樹 Binary Tree 即是除了具有原本樹 Tree 的性質外，再加上">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/full-binary-tree.png">
+<meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/complete-binary-tree.png">
+<meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/order.png">
+<meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/pre-order.png">
+<meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/pre-order.png">
+<meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/pre-order.png">
+<meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/pre-order.png">
+<meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/in-order.png">
+<meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/in-order.png">
+<meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/in-order.png">
+<meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/post-order.png">
+<meta property="og:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/post-order.png">
+<meta property="article:published_time" content="2022-04-05T16:49:49.000Z">
+<meta property="article:modified_time" content="2023-06-19T09:38:54.485Z">
+<meta property="article:author" content="Chen Po Yu">
+<meta property="article:tag" content="javascript, structure, tree">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/full-binary-tree.png">
+  
+  
+  
+    <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-LG5KBKG5S0"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date());
+gtag("config", "G-LG5KBKG5S0"); </script>
+  
+  <title>JavaScript 二元樹：前序、中序、後序、層序演算法（上） - pyshif blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  <link rel="stylesheet" href="/css/about-avatar.css" />
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Web Learning</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/your-advice/">
+                <i class="iconfont icon-pen"></i>
+                Your Advice
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JavaScript 二元樹：前序、中序、後序、層序演算法（上）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-04-05 16:49" pubdate>
+          April 5, 2022 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          15k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          130 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">JavaScript 二元樹：前序、中序、後序、層序演算法（上）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>本篇文章依照自己的理解和話，整理、延伸自<a target="_blank" rel="noopener" href="http://alrightchiu.github.io/SecondRound/pages/about.html">Chiu CC 部落格</a> 有關於樹的一系列以 C++ 實作的文章重點。</p>
+<p>接下來簡單介紹下二元樹 Binary Tree，以及使用 JavaScript 實作出二元樹 4 種尋訪（前、中、後、層序），實作的過程會紀錄尋訪規則、資料結構、演算法設計，一直到建構代碼。</p>
+<h2 id="二元樹『介紹』"><a href="#二元樹『介紹』" class="headerlink" title="二元樹『介紹』"></a>二元樹『介紹』</h2><p>所謂的二元樹 Binary Tree 即是除了具有原本樹 Tree 的性質外，再加上每個節點限制至多兩個子樹的特性（degree 為 2 的限制）。</p>
+<blockquote>
+<p>一般以左子樹 left child 和 右子樹 right child 來稱呼。</p>
+</blockquote>
+<h3 id="Full-Binary-Tree"><a href="#Full-Binary-Tree" class="headerlink" title="Full Binary Tree"></a>Full Binary Tree</h3><p><img src="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/full-binary-tree.png" srcset="/img/loading.gif" lazyload></p>
+<p>當一個二元樹，符合以下 2 個條件時，即可稱為 Full Binary Tree</p>
+<ul>
+<li>所有 leaf node 都具有相同的 level</li>
+<li>除 leaf node 外的 node 都具有 2 個 child</li>
+</ul>
+<p>衍生特性</p>
+<ul>
+<li>N level 的 Full Binary Tree，共有 2^N - 1 個 node</li>
+<li>第 N 個 node 的 left child 索引值為 2N，right child 索引值為 2N + 1</li>
+<li>第 N 個 node 的 parent 索引值為 N &#x2F; 2 取整數</li>
+</ul>
+<h3 id="Complete-Binary-Tree"><a href="#Complete-Binary-Tree" class="headerlink" title="Complete Binary Tree"></a>Complete Binary Tree</h3><p><img src="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/complete-binary-tree.png" srcset="/img/loading.gif" lazyload></p>
+<p>若一個二元樹 node 排列按照 Full Binary Tree 次序（由上至下，由左至右），則稱此數為 Complete Binary Tree。</p>
+<h2 id="二元樹『尋訪』"><a href="#二元樹『尋訪』" class="headerlink" title="二元樹『尋訪』"></a>二元樹『尋訪』</h2><p>『尋訪（Traversal）』的意思就是『從一個起始點開始，往所有與該點相連的地方移動』。</p>
+<ul>
+<li>層序的規則如上面 Complete Binary Tree、Full Binary Tree 所表示，每層依序由左至右</li>
+<li>前、中、後序規則如下圖</li>
+</ul>
+<p><img src="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/order.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="符號定義"><a href="#符號定義" class="headerlink" title="符號定義"></a>符號定義</h3><ul>
+<li>V：對當前節點進行『訪問』</li>
+<li>L：移動至當前節點的『左子樹』</li>
+<li>R：移動到當前節點的『右子樹』</li>
+<li>P：移動到當前節點的『父節點』</li>
+<li>()：用來刮住上述符號，表示移動 or 訪問失敗</li>
+</ul>
+<h3 id="觀念建立"><a href="#觀念建立" class="headerlink" title="觀念建立"></a>觀念建立</h3><p>前、中、後序的尋訪規則分別為 VLR、LVR、LRV</p>
+<ul>
+<li>前序：訪問 -&gt; 前往左子樹 -&gt; 前往右子樹</li>
+<li>中序：前往左子樹 -&gt; 訪問 -&gt; 前往右子樹</li>
+<li>後序：前往左子樹 -&gt; 前往右子樹 -&gt; 訪問</li>
+</ul>
+<p>尋訪規則所表達的是『優先程度』。以中序規則來說，並不是前往左子樹完後下一步一定是對節點訪問，什麼意思呢？</p>
+<p>讓我們再進一步將規則講清楚，所謂的尋訪規則是對於『每個節點來說』，意思是『每到一個節點，我們都要重新依照這樣的優先順序進行判斷、執行』</p>
+<p>換句話說，在中序規則下，我們總是不斷先前往左子樹，直到無法前往時，才執行訪問</p>
+<p>還不熟沒關係，下面一步一步慢慢理解</p>
+<h2 id="二元樹『資料結構』"><a href="#二元樹『資料結構』" class="headerlink" title="二元樹『資料結構』"></a>二元樹『資料結構』</h2><p>在開始實作二元樹的演算法前，我們需要先定義下二元樹的『資料結構』，資料結構是什麼？就是決定資料如何被存放、組織，而為演算法所用的意思。</p>
+<p>讓我們用 JavaScript 來建構出『儲存樹節點』和『存儲樹』的資料容器。</p>
+<blockquote>
+<p>以下提供 class 版本的和，一般函數版本（class 在 JavaScript 中只是單純的語法糖）</p>
+</blockquote>
+<ul>
+<li>儲存二元樹節點</li>
+</ul>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-comment">// class 版本</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TreeNode</span> </span>&#123;<br>    <span class="hljs-keyword">constructor</span> (<span class="hljs-keyword">data</span>) &#123;<br>        <span class="hljs-comment">// 紀錄 父節點</span><br>        <span class="hljs-keyword">this</span>.parent = <span class="hljs-literal">null</span>;<br>        <span class="hljs-comment">// 紀錄 右子樹根節點</span><br>        <span class="hljs-keyword">this</span>.rightChild = <span class="hljs-literal">null</span>;<br>        <span class="hljs-comment">// 紀錄 左子樹根節點</span><br>        <span class="hljs-keyword">this</span>.leftChild = <span class="hljs-literal">null</span>;<br>        <span class="hljs-comment">// 存儲 資料</span><br>        <span class="hljs-keyword">this</span>.<span class="hljs-keyword">data</span> = <span class="hljs-keyword">data</span>;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">// function 版本</span><br>function TreeNode (<span class="hljs-keyword">data</span>) &#123;<br>    <span class="hljs-keyword">this</span>.parent = <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">this</span>.rightChild = <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">this</span>.leftChild = <span class="hljs-literal">null</span>;<br>    <span class="hljs-keyword">this</span>.<span class="hljs-keyword">data</span>= <span class="hljs-keyword">data</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>儲存整棵樹</li>
+</ul>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs wren"><span class="hljs-comment">// class 版本</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">BinaryTree</span> &#123;<br>    <span class="hljs-title function_">constructor</span> (<span class="hljs-variable">root</span>) &#123;<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-property">root</span> <span class="hljs-operator">=</span> <span class="hljs-variable">root</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// 前序尋訪</span><br>    <span class="hljs-title function_">preOrder</span>(<span class="hljs-params">node</span>) &#123;&#125; <br><br>    <span class="hljs-comment">// 中序尋訪</span><br>    <span class="hljs-title function_">inOrder</span>(<span class="hljs-params">node</span>) &#123;&#125;<br><br>    <span class="hljs-comment">// 後序尋訪</span><br>    <span class="hljs-title function_">postOrder</span>(<span class="hljs-params">node</span>) &#123;&#125;<br><br>    <span class="hljs-comment">// 層序尋訪</span><br>    <span class="hljs-title function_">levelOrder</span>(<span class="hljs-params">node</span>) &#123;&#125;<br><br>    <span class="hljs-comment">// 進階前序尋訪</span><br>    <span class="hljs-title function_">preOrderByParent</span>(<span class="hljs-params">node</span>) &#123;&#125;<br><br>    <span class="hljs-comment">// 進階版中序尋訪</span><br>    <span class="hljs-title function_">inOrderByParent</span>(<span class="hljs-params">node</span>) &#123;&#125;<br><br>    <span class="hljs-comment">// 進階版後序尋訪</span><br>    <span class="hljs-title function_">postOrderByParent</span>(<span class="hljs-params">node</span>) &#123;&#125;<br><br>    <span class="hljs-comment">// 前序尋訪規則下，尋找下一個節點</span><br>    <span class="hljs-title function_">preOrderSuccessor</span>(<span class="hljs-params">current</span>) &#123;&#125;<br><br>    <span class="hljs-comment">// 中序尋訪規則下，尋找下一個節點</span><br>    <span class="hljs-title function_">inOrderSuccessor</span>(<span class="hljs-params">current</span>) &#123;&#125;<br><br>    <span class="hljs-comment">// 後序尋訪規則下，尋找下一個節點</span><br>    <span class="hljs-title function_">postOrderSuccessor</span>(<span class="hljs-params">current</span>) &#123;&#125;<br><br>    <span class="hljs-comment">// 尋找最左節點</span><br>    <span class="hljs-title function_">leftMost</span>(<span class="hljs-params">current</span>) &#123;&#125;<br><br>    <span class="hljs-comment">// 尋找最右節點</span><br>    <span class="hljs-title function_">rightMost</span>(<span class="hljs-params">current</span>) &#123;&#125;<br>&#125;<br><br><span class="hljs-comment">// function 版本</span><br><span class="hljs-variable">function</span> <span class="hljs-title class_">BinaryTree</span> (<span class="hljs-variable">root</span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">root</span> <span class="hljs-operator">=</span> <span class="hljs-variable">root</span>;<br>&#125;<br><br><span class="hljs-title class_">BinaryTree</span>.<span class="hljs-property">prototype</span>.<span class="hljs-property">preOrder</span> <span class="hljs-operator">=</span> <span class="hljs-title function_">function</span> (<span class="hljs-variable">node</span>) &#123;&#125;<br><span class="hljs-title class_">BinaryTree</span>.<span class="hljs-property">prototype</span>.<span class="hljs-property">inOrder</span> <span class="hljs-operator">=</span> <span class="hljs-title function_">function</span> (<span class="hljs-variable">node</span>) &#123;&#125;<br><span class="hljs-title class_">BinaryTree</span>.<span class="hljs-property">prototype</span>.<span class="hljs-property">postOrder</span> <span class="hljs-operator">=</span> <span class="hljs-title function_">function</span> (<span class="hljs-variable">node</span>) &#123;&#125;<br><span class="hljs-title class_">BinaryTree</span>.<span class="hljs-property">prototype</span>.<span class="hljs-property">levelOrder</span> <span class="hljs-operator">=</span> <span class="hljs-title function_">function</span> (<span class="hljs-variable">node</span>) &#123;&#125;<br><span class="hljs-title class_">BinaryTree</span>.<span class="hljs-property">prototype</span>.<span class="hljs-property">preOrderByParent</span> <span class="hljs-operator">=</span> <span class="hljs-title function_">function</span> (<span class="hljs-variable">node</span>) &#123;&#125;<br><span class="hljs-title class_">BinaryTree</span>.<span class="hljs-property">prototype</span>.<span class="hljs-property">inOrderByParent</span> <span class="hljs-operator">=</span> <span class="hljs-title function_">function</span> (<span class="hljs-variable">node</span>) &#123;&#125;<br><span class="hljs-title class_">BinaryTree</span>.<span class="hljs-property">prototype</span>.<span class="hljs-property">postOrderByParent</span> <span class="hljs-operator">=</span> <span class="hljs-title function_">function</span> (<span class="hljs-variable">node</span>) &#123;&#125;<br><span class="hljs-title class_">BinaryTree</span>.<span class="hljs-property">prototype</span>.<span class="hljs-property">preOrderSuccessor</span> <span class="hljs-operator">=</span> <span class="hljs-title function_">function</span> (<span class="hljs-variable">current</span>) &#123;&#125;<br><span class="hljs-title class_">BinaryTree</span>.<span class="hljs-property">prototype</span>.<span class="hljs-property">inOrderSuccessor</span> <span class="hljs-operator">=</span> <span class="hljs-title function_">function</span> (<span class="hljs-variable">current</span>) &#123;&#125;<br><span class="hljs-title class_">BinaryTree</span>.<span class="hljs-property">prototype</span>.<span class="hljs-property">postOrderSuccessor</span> <span class="hljs-operator">=</span> <span class="hljs-title function_">function</span> (<span class="hljs-variable">current</span>) &#123;&#125;<br><span class="hljs-title class_">BinaryTree</span>.<span class="hljs-property">prototype</span>.<span class="hljs-property">leftMost</span> <span class="hljs-operator">=</span> <span class="hljs-title function_">function</span> (<span class="hljs-variable">current</span>) &#123;&#125;<br><span class="hljs-title class_">BinaryTree</span>.<span class="hljs-property">prototype</span>.<span class="hljs-property">rightMost</span> <span class="hljs-operator">=</span> <span class="hljs-title function_">function</span> (<span class="hljs-variable">current</span>) &#123;&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="二元樹演算法『設計』（上）"><a href="#二元樹演算法『設計』（上）" class="headerlink" title="二元樹演算法『設計』（上）"></a>二元樹演算法『設計』（上）</h2><p>『演算法』是什麼意思？我想所謂的演算法就是『解決問題的過程、步驟、方法』</p>
+<p>而此處我們要做的就是，將我們『人』所能理解的過程、步驟、方法，轉換成『電腦』能夠理解的過程、步驟，方法，也稱作演算法</p>
+<p>為了達成這樣的目的（將尋訪規則，建構出電腦能執行的代碼），我們規劃了幾個階段</p>
+<ul>
+<li>將尋訪執行的『過程』，以『序列』的方式記錄下來</li>
+<li>配合『尋訪規則』和『序列』紀錄，找出『共同處』</li>
+<li>從『共同處』一步步建構出『代碼』</li>
+<li>『檢驗』產出的代碼，是否符合演算法的需求</li>
+<li>『優化』代碼</li>
+</ul>
+<h2 id="二元樹演算法『需求』（上）"><a href="#二元樹演算法『需求』（上）" class="headerlink" title="二元樹演算法『需求』（上）"></a>二元樹演算法『需求』（上）</h2><p>一個演算法，通常具有『輸入』和『輸出』，這個部分在上述的資料結構中大概定義完畢，此處在做更詳細的說明。</p>
+<h3 id="preOrder-node"><a href="#preOrder-node" class="headerlink" title="preOrder (node)"></a>preOrder (node)</h3><ul>
+<li>輸入： TreeNode 資料，作為『前序』尋訪起點</li>
+<li>輸出： -</li>
+<li>執行：前序尋訪，將訪問到的節點資料打印出來（使用遞回實作）</li>
+</ul>
+<h3 id="inOrder-node"><a href="#inOrder-node" class="headerlink" title="inOrder (node)"></a>inOrder (node)</h3><ul>
+<li>輸入： TreeNode 資料，作為『中序』尋訪起點</li>
+<li>輸出： -</li>
+<li>執行：中序尋訪，將訪問到的節點資料打印出來（使用遞回實作）</li>
+</ul>
+<h3 id="postOrder-node"><a href="#postOrder-node" class="headerlink" title="postOrder (node)"></a>postOrder (node)</h3><ul>
+<li>輸入： TreeNode 資料，作為『後序』尋訪起點</li>
+<li>輸出： -</li>
+<li>執行：後序尋訪，將訪問到的節點資料打印出來（使用遞回實作）</li>
+</ul>
+<h3 id="levelOrder-node"><a href="#levelOrder-node" class="headerlink" title="levelOrder (node)"></a>levelOrder (node)</h3><ul>
+<li>輸入： TreeNode 資料，作為『層序』尋訪起點</li>
+<li>輸出： -</li>
+<li>執行：層序尋訪，將訪問到的節點資料打印出來（使用遞回實作）</li>
+</ul>
+<h3 id="preOrderByParent-node"><a href="#preOrderByParent-node" class="headerlink" title="preOrderByParent (node)"></a>preOrderByParent (node)</h3><ul>
+<li>輸入： TreeNode 資料，作為『前序』尋訪起點</li>
+<li>輸出： -</li>
+<li>執行：前序尋訪，將訪問到的節點資料打印出來（使用下方 preOrderSuccessor 取代遞回實作）</li>
+</ul>
+<h3 id="inOrderByParent-node"><a href="#inOrderByParent-node" class="headerlink" title="inOrderByParent (node)"></a>inOrderByParent (node)</h3><ul>
+<li>輸入： TreeNode 資料，作為『中序』尋訪起點</li>
+<li>輸出： -</li>
+<li>執行：中序尋訪，將訪問到的節點資料打印出來（使用下方 inOrderSuccessor 取代遞回實作）</li>
+</ul>
+<h3 id="postOrderByParent-node"><a href="#postOrderByParent-node" class="headerlink" title="postOrderByParent (node)"></a>postOrderByParent (node)</h3><ul>
+<li>輸入： TreeNode 資料，作為『後序』尋訪起點</li>
+<li>輸出： -</li>
+<li>執行：後序尋訪，將訪問到的節點資料打印出來（使用下方 postOrderSuccessor 取代遞回實作）</li>
+</ul>
+<h3 id="preOrderSuccessor-current"><a href="#preOrderSuccessor-current" class="headerlink" title="preOrderSuccessor (current)"></a>preOrderSuccessor (current)</h3><ul>
+<li>輸入： TreeNode 資料，任一樹中節點</li>
+<li>輸出： 前序尋訪規則下，該輸入節點的下一個節點</li>
+<li>執行： 前序尋訪的下一個節點尋找</li>
+</ul>
+<h3 id="inOrderSuccessor-current"><a href="#inOrderSuccessor-current" class="headerlink" title="inOrderSuccessor (current)"></a>inOrderSuccessor (current)</h3><ul>
+<li>輸入： TreeNode 資料，任一樹中節點</li>
+<li>輸出： 中序尋訪規則下，該輸入節點的下一個節點</li>
+</ul>
+<h3 id="postOrderSuccessor-current"><a href="#postOrderSuccessor-current" class="headerlink" title="postOrderSuccessor (current)"></a>postOrderSuccessor (current)</h3><ul>
+<li>輸入： TreeNode 資料，任一樹中節點</li>
+<li>輸出： 後序尋訪規則下，該輸入節點的下一個節點</li>
+</ul>
+<h3 id="leftMost-current"><a href="#leftMost-current" class="headerlink" title="leftMost (current)"></a>leftMost (current)</h3><ul>
+<li>輸入： TreeNode 資料，任一樹中節點</li>
+<li>輸出： 該輸入節點開始，左子樹方向，最左的節點</li>
+</ul>
+<h3 id="rightMost-current"><a href="#rightMost-current" class="headerlink" title="rightMost (current)"></a>rightMost (current)</h3><ul>
+<li>輸入： TreeNode 資料，任一樹中節點</li>
+<li>輸出： 該輸入節點開始，右子樹方向，最右的節點</li>
+</ul>
+<h2 id="演算法實作『前序』"><a href="#演算法實作『前序』" class="headerlink" title="演算法實作『前序』"></a>演算法實作『前序』</h2><h3 id="preOrder-node-1"><a href="#preOrder-node-1" class="headerlink" title="preOrder (node)"></a>preOrder (node)</h3><p>使用『遞迴 recursion』的概念即可快速的實作出，前序演算法。</p>
+<p>為求效能、彈性接著會在實作 <code>preOrderByParent (node)</code> 來完成同樣效果的演算法。</p>
+<p>我們知道前序尋訪優先順序是</p>
+<ol>
+<li>V: 訪問</li>
+<li>L: 向左子樹移動</li>
+<li>R: 向右子樹移動</li>
+</ol>
+<p>至此，讓我們將代碼建構出來</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">function preOrder (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">    if</span> (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">        console</span>.log(` This <span class="hljs-keyword">node</span><span class="hljs-title">&#x27;s</span> data: $&#123;node.data&#125;`);<br>        preOrder(node.leftChild);<br>        preOrder(node.rightChild);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>通過依照前序尋訪的優先順序進行『遞回』呼叫，來達成『推疊 stack』先進後出的效果，即可完成。</p>
+<blockquote>
+<p>if 判斷式用來作為『遞回』的結束條件</p>
+</blockquote>
+<h3 id="preOrderSuccessor-current-1"><a href="#preOrderSuccessor-current-1" class="headerlink" title="preOrderSuccessor(current)"></a>preOrderSuccessor(current)</h3><p>上述遞迴（recursion）形式的尋訪，節點資料的訪問，和移動被包在同一個函式中，因此在實作對節點多種不同的資料訪問時，都需要重寫一個函式。</p>
+<p>因此，為了將資料訪問 V，能夠獨立開來，我們需要實現另一種非遞迴版本的尋訪。</p>
+<blockquote>
+<p>引用整理自 <a target="_blank" rel="noopener" href="http://alrightchiu.github.io/SecondRound/pages/about.html">Chiu CC</a> 內文：</p>
+</blockquote>
+<p>在實現非遞迴版本的尋訪前，我們需要建立一個函式來指出『下一個節點的位置』</p>
+<p>讓我們依照前面提到的演算法設計階段來一步步建構出我們的代碼</p>
+<h4 id="紀錄『序列』"><a href="#紀錄『序列』" class="headerlink" title="紀錄『序列』"></a>紀錄『序列』</h4><p>我們思考下 preOrderSuccessor 函式的需求</p>
+<ul>
+<li>輸入：任意二元樹中的節點</li>
+<li>輸出：下一個節點的位置</li>
+</ul>
+<p>換句話說，在 V-L-R 優先順序中，我們會從特定節點訪問完畢『出發』，找到下一個節點訪問完畢 『結束』</p>
+<p>因此，我們紀錄的每個序列將會是以 V 開頭，V 結尾</p>
+<p><img src="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/pre-order.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs erlang">- # node 1 <span class="hljs-params">(A)</span> 前往 node 2 <span class="hljs-params">(B)</span><br>|<br>-  V    L    V<br>|<br>- # node 2 <span class="hljs-params">(B)</span> 前往 node 3 <span class="hljs-params">(D)</span><br>|<br>-  V    L    V<br>|<br>- # node 3 <span class="hljs-params">(D)</span> 前往 node 4 <span class="hljs-params">(E)</span><br>|<br>-  V   <span class="hljs-params">(L)</span>  <span class="hljs-params">(R)</span>   P   <span class="hljs-params">(VL)</span>   R    V<br>|<br>- # node 4 <span class="hljs-params">(E)</span> 前往 node 5 <span class="hljs-params">(G)</span><br>|<br>-  V    L    V<br>|<br>- # node 5 <span class="hljs-params">(G)</span> 前往 node 6 <span class="hljs-params">(H)</span><br>|<br>-  V   <span class="hljs-params">(L)</span>  <span class="hljs-params">(R)</span>   P   <span class="hljs-params">(VL)</span>   R    V <br>|<br>- # node 6 <span class="hljs-params">(H)</span> 前往 node 7 <span class="hljs-params">(C)</span><br>|<br>-  V   <span class="hljs-params">(L)</span>  <span class="hljs-params">(R)</span>   P   <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  P   <span class="hljs-params">(VL)</span>   R    V<br>|<br>- # node 7 <span class="hljs-params">(C)</span> 前往 node 8 <span class="hljs-params">(F)</span><br>|<br>-  V    L    V<br>|<br>- # node 8 <span class="hljs-params">(F)</span> 前往 node 9 <span class="hljs-params">(I)</span><br>|<br>-  V   <span class="hljs-params">(L)</span>   R    V<br>|<br>- # node 9 <span class="hljs-params">(I)</span> 前往 null<br>|<br>-  V   <span class="hljs-params">(L)</span>  <span class="hljs-params">(R)</span>   P  <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  <span class="hljs-params">(P)</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="觀察『共同性』"><a href="#觀察『共同性』" class="headerlink" title="觀察『共同性』"></a>觀察『共同性』</h4><p>從前序的規則 V-L-R 和上面的序列，我們可以很清楚的知道，節點的訪問 V 下一步就是左子樹的尋訪 L</p>
+<p>而序列中可以清楚看到左子樹的尋訪 L，存在 2 種情況</p>
+<ul>
+<li>左子樹存在，前往並且訪問節點 V</li>
+<li>左子樹不存在，輪到檢查右子樹 R</li>
+</ul>
+<h4 id="建構『代碼』"><a href="#建構『代碼』" class="headerlink" title="建構『代碼』"></a>建構『代碼』</h4><p>至此，讓我們將代碼建構出來</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-keyword">function</span> preOrderSuccessor (current) &#123;<br>    <span class="hljs-regexp">//</span> 左子樹存在，前往並且訪問節點<br>    <span class="hljs-keyword">if</span> (current.leftChild) &#123;<br>        return current.leftChild;<br>    &#125;<br>    <span class="hljs-regexp">//</span> 左子樹不存在，接著檢查右子樹<br>    <span class="hljs-keyword">if</span> (current.rightChild) &#123;<br>        <span class="hljs-regexp">//</span> ...<br>    &#125;<br><br>    <span class="hljs-regexp">//</span>...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="紀錄『序列』-1"><a href="#紀錄『序列』-1" class="headerlink" title="紀錄『序列』"></a>紀錄『序列』</h4><p>上一輪的演算法設計，我們已經處理掉『左子樹存在』的情況，讓我們簡化下序列，並接著觀察</p>
+<p><img src="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/pre-order.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs erlang">- # node 3 <span class="hljs-params">(D)</span> 前往 node 4 <span class="hljs-params">(E)</span><br>|<br>-  V   <span class="hljs-params">(L)</span> |  <span class="hljs-params">(R)</span>   P   <span class="hljs-params">(VL)</span>   R    V<br>|<br>- # node 5 <span class="hljs-params">(G)</span> 前往 node 6 <span class="hljs-params">(H)</span><br>|<br>-  V   <span class="hljs-params">(L)</span> |  <span class="hljs-params">(R)</span>   P   <span class="hljs-params">(VL)</span>   R    V <br>|<br>- # node 6 <span class="hljs-params">(H)</span> 前往 node 7 <span class="hljs-params">(C)</span><br>|<br>-  V   <span class="hljs-params">(L)</span> |  <span class="hljs-params">(R)</span>   P   <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  P   <span class="hljs-params">(VL)</span>   R    V<br>|<br>- # node 8 <span class="hljs-params">(F)</span> 前往 node 9 <span class="hljs-params">(I)</span><br>|<br>-  V   <span class="hljs-params">(L)</span> |   R    V<br>|<br>- # node 9 <span class="hljs-params">(I)</span> 前往 null<br>|<br>-  V   <span class="hljs-params">(L)</span> |  <span class="hljs-params">(R)</span>   P  <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  <span class="hljs-params">(P)</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="觀察『共同性』-1"><a href="#觀察『共同性』-1" class="headerlink" title="觀察『共同性』"></a>觀察『共同性』</h4><p>根據前序 V-L-R 和序列，當左子樹不存在時，接著就是判斷右子樹。同樣的右子樹的檢查也存在 2 種結果</p>
+<ul>
+<li>右子樹存在，前往並且訪問節點 V</li>
+<li>右子樹不存在，整個子樹都已檢查完，返回父節點 P</li>
+</ul>
+<h4 id="建構『代碼』-1"><a href="#建構『代碼』-1" class="headerlink" title="建構『代碼』"></a>建構『代碼』</h4><p>至此，讓我們將代碼建構出來</p>
+<figure class="highlight nsis"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs nsis"><span class="hljs-keyword">function</span> <span class="hljs-title function_">preOrderSuccessor</span> (<span class="hljs-literal">current</span>) &#123;<br>    if (<span class="hljs-literal">current</span>.leftChild) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">current</span>.leftChild<span class="hljs-comment">;</span><br>    &#125;<br><br>    if (<span class="hljs-literal">current</span>.rightChild) &#123;<br>        // 右子樹存在，訪問節點<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">current</span>.rightChild<span class="hljs-comment">;</span><br>    &#125;<br><br>    // 右子樹不存在<br>    //...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="紀錄『序列』-2"><a href="#紀錄『序列』-2" class="headerlink" title="紀錄『序列』"></a>紀錄『序列』</h4><p>接著我們同樣將『右子樹存在』這樣處理完畢的情況，從序列中排除，簡化畫面</p>
+<p><img src="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/pre-order.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs erlang">- # node 3 <span class="hljs-params">(D)</span> 前往 node 4 <span class="hljs-params">(E)</span><br>|<br>-  V   <span class="hljs-params">(L)</span>   <span class="hljs-params">(R)</span>  |  P   <span class="hljs-params">(VL)</span>   R    V<br>|<br>- # node 5 <span class="hljs-params">(G)</span> 前往 node 6 <span class="hljs-params">(H)</span><br>|<br>-  V   <span class="hljs-params">(L)</span>   <span class="hljs-params">(R)</span>  |  P   <span class="hljs-params">(VL)</span>   R    V <br>|<br>- # node 6 <span class="hljs-params">(H)</span> 前往 node 7 <span class="hljs-params">(C)</span><br>|<br>-  V   <span class="hljs-params">(L)</span>   <span class="hljs-params">(R)</span>  |  P   <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  P   <span class="hljs-params">(VL)</span>   R    V<br>|<br>- # node 9 <span class="hljs-params">(I)</span> 前往 null<br>|<br>-  V   <span class="hljs-params">(L)</span>   <span class="hljs-params">(R)</span>  |  P  <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  <span class="hljs-params">(P)</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="觀察『共同性』-2"><a href="#觀察『共同性』-2" class="headerlink" title="觀察『共同性』"></a>觀察『共同性』</h4><p>我們已經，完成完整一次的 V-L-R 前序的檢查，這樣的情況表示，以當前節點作為根節點的子樹，已尋訪完畢，因此我們向後退回父節點</p>
+<p>而退回父節點同樣存在 2 種情況</p>
+<ul>
+<li>做為父節點的左子樹退回</li>
+<li>做為父節點的右子樹退回</li>
+</ul>
+<p>綜合上面的觀察，我們可以得到這樣的性質</p>
+<ul>
+<li>做為父節點的左子樹退回，表示左子樹已尋訪完畢，根據 V-L-R 規則，接下來檢查右子樹 R</li>
+<li>做為父節點的右子樹退回，表示右子樹已尋訪完畢，根據 V-L-R 規則，當前子樹也尋訪完畢再繼續往父節點退回</li>
+</ul>
+<p>因此，我們可以做出這樣的結論</p>
+<ul>
+<li>只要是『從左子樹退回，且該父節點不存在右子樹』，那麼就繼續往父節點退回</li>
+<li>只要是『從右子樹退回』，那麼就繼續往父節點退回</li>
+</ul>
+<h4 id="建構『代碼』-2"><a href="#建構『代碼』-2" class="headerlink" title="建構『代碼』"></a>建構『代碼』</h4><p>至此，根據我們的結論，來建構下代碼</p>
+<figure class="highlight qml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs qml"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">preOrderSuccessor</span> (<span class="hljs-params">current</span>) </span>&#123;<br>    <span class="hljs-keyword">if</span> (current.leftChild) &#123;<br>        <span class="hljs-keyword">return</span> current.leftChild;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (current.rightChild) &#123;<br>        <span class="hljs-keyword">return</span> current.rightChild;<br>    &#125;<br><br>    <span class="hljs-comment">// 右子樹不存在，退回父節點</span><br>    <span class="hljs-keyword">let</span> successor = current.parent;<br><br><br>    <span class="hljs-comment">// 只要是『從左子樹退回，且該父節點不存在右子樹』，那麼就繼續往父節點退回</span><br>    <span class="hljs-comment">// 只要是『從右子樹退回』，那麼就繼續往父節點退回</span><br>    <span class="hljs-keyword">while</span> (successor != <span class="hljs-literal">null</span> &amp;&amp; (successor.rightChild === current || successor.rightChild === <span class="hljs-literal">null</span>)) &#123;<br>        current = successor;<br>        successor = current.parent<br>    &#125;<br><br>    <span class="hljs-comment">//...</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="紀錄『序列』-3"><a href="#紀錄『序列』-3" class="headerlink" title="紀錄『序列』"></a>紀錄『序列』</h4><p>最後，我們來將剩下的序列完成</p>
+<p><img src="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/pre-order.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs erlang">- # node 3 <span class="hljs-params">(D)</span> 前往 node 4 <span class="hljs-params">(E)</span><br>|<br>-  V   <span class="hljs-params">(L)</span>   <span class="hljs-params">(R)</span>    P   <span class="hljs-params">(VL)</span>  |  R    V<br>|<br>- # node 5 <span class="hljs-params">(G)</span> 前往 node 6 <span class="hljs-params">(H)</span><br>|<br>-  V   <span class="hljs-params">(L)</span>   <span class="hljs-params">(R)</span>    P   <span class="hljs-params">(VL)</span>  | R    V <br>|<br>- # node 6 <span class="hljs-params">(H)</span> 前往 node 7 <span class="hljs-params">(C)</span><br>|<br>-  V   <span class="hljs-params">(L)</span>   <span class="hljs-params">(R)</span>    P   <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  P   <span class="hljs-params">(VL)</span> |  R    V<br>|<br>- # node 9 <span class="hljs-params">(I)</span> 前往 null<br>|<br>-  V   <span class="hljs-params">(L)</span>   <span class="hljs-params">(R)</span>    P  <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span>  P  <span class="hljs-params">(VLR)</span> | <span class="hljs-params">(P)</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="觀察『共同性』-3"><a href="#觀察『共同性』-3" class="headerlink" title="觀察『共同性』"></a>觀察『共同性』</h4><p>最後，我們可以看到，父節點的退回，會直到『由左子樹退回，且該父節點存在右子樹』這樣的情況發生而停止（當退回到根節點，由於不能再退也會停止）</p>
+<ul>
+<li>右子樹存在，根據 V-L-R 前往，並且訪問 V</li>
+</ul>
+<h4 id="建構『代碼』-3"><a href="#建構『代碼』-3" class="headerlink" title="建構『代碼』"></a>建構『代碼』</h4><p>讓我們將最後的代碼完成</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">function</span> preOrderSuccessor (<span class="hljs-keyword">current</span>) &#123;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">current</span>.leftChild) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">current</span>.leftChild;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">current</span>.rightChild) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">current</span>.rightChild;<br>    &#125;<br><br>    let successor = <span class="hljs-keyword">current</span>.parent;<br>    <span class="hljs-keyword">while</span> (successor != <span class="hljs-keyword">null</span> &amp;&amp; (successor.rightChild === <span class="hljs-keyword">current</span> || successor.rightChild === <span class="hljs-keyword">null</span>)) &#123;<br>        <span class="hljs-keyword">current</span> = successor;<br>        successor = <span class="hljs-keyword">current</span>.parent<br>    &#125;<br><br>    // 退回之父節點，存在右子樹，前往並訪問節點<br>    <span class="hljs-keyword">if</span> (successor != <span class="hljs-keyword">null</span>)<br>        <span class="hljs-keyword">return</span> successor.rightChild;<br>    <br>    <span class="hljs-keyword">return</span> successor;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="preOrderByParent-node-1"><a href="#preOrderByParent-node-1" class="headerlink" title="preOrderByParent(node)"></a>preOrderByParent(node)</h3><p>上面，我們已經完成，前序規則下，下一個節點的找尋函式，那麼讓我們將原本遞迴（recursion）方式寫成的前序演算法改寫下吧</p>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-keyword">function</span> <span class="hljs-title function_">preOrderByParent</span> (<span class="hljs-params">node</span>) &#123;<br>    let current = node;<br><br>    <span class="hljs-keyword">while</span> (current) &#123;<br>        <span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span>(<span class="hljs-string">` <span class="hljs-subst">$&#123;current.data&#125;</span>`</span>); <span class="hljs-comment">// Visiting</span><br>        current = preOrderSuccessor(current); <span class="hljs-comment">// Traversal</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="演算法實作『中序』"><a href="#演算法實作『中序』" class="headerlink" title="演算法實作『中序』"></a>演算法實作『中序』</h2><h3 id="inOrder-node-1"><a href="#inOrder-node-1" class="headerlink" title="inOrder (node)"></a>inOrder (node)</h3><p>使用『遞迴 recursion』的概念即可快速的實作出，中序演算法。</p>
+<p>為求效能、彈性接著會在實作 <code>inOrderByParent (node)</code> 來完成同樣效果的演算法。</p>
+<p>我們知道中序尋訪優先順序是</p>
+<ol>
+<li>L: 向左子樹移動</li>
+<li>V: 訪問</li>
+<li>R: 向右子樹移動</li>
+</ol>
+<p>至此，讓我們將代碼建構出來</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">function inOrder (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">    if</span> (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">        preOrder</span>(node.leftChild);<br>        console.log(` This <span class="hljs-keyword">node</span><span class="hljs-title">&#x27;s</span> data: $&#123;node.data&#125;`);<br>        preOrder(node.rightChild);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>通過依照中序尋訪的優先順序進行『遞回』呼叫，來達成『推疊 stack』先進後出的效果，即可完成。</p>
+<blockquote>
+<p>if 判斷式用來作為『遞回』的結束條件</p>
+</blockquote>
+<h3 id="inOrderSuccessor-current-1"><a href="#inOrderSuccessor-current-1" class="headerlink" title="inOrderSuccessor (current)"></a>inOrderSuccessor (current)</h3><p>如同前述，遞迴（recursion）形式的尋訪，對於節點資料訪問開始有多種不同形式時，因為演算法設計上的耦合性，所以必須每次都重寫一個函式。</p>
+<p>因此，為了將 Visiting 行為獨立開來，我們需要實現非遞迴版本的演算法。</p>
+<blockquote>
+<p>引用整理自 <a target="_blank" rel="noopener" href="http://alrightchiu.github.io/SecondRound/pages/about.html">Chiu CC</a> 內文：</p>
+</blockquote>
+<p>而在實現非遞迴版本的尋訪前，我們有些前置作業要做</p>
+<p>首先我們需要實現一函式，當輸入一節點時，能夠輸出『下一個節點的位置』</p>
+<p>接下來，讓我們依照前面提到的演算法設計階段來一步步建構出我們的代碼</p>
+<blockquote>
+<p>紀錄序列 -&gt; 觀察共同性 -&gt; 建構代碼</p>
+</blockquote>
+<h4 id="紀錄『序列』-4"><a href="#紀錄『序列』-4" class="headerlink" title="紀錄『序列』"></a>紀錄『序列』</h4><p>我們思考下 inOrderSuccessor 函式的需求</p>
+<ul>
+<li>輸入：任意二元樹中的節點</li>
+<li>輸出：下一個節點的位置</li>
+</ul>
+<p>換句話說，我們可以解成，我們需要找出 2 次連續的 Visiting 之間的規則</p>
+<p>因此，我們紀錄的每筆序列將會是以 V 開頭，V 結尾</p>
+<p><img src="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/in-order.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs erlang">- # node 1 <span class="hljs-params">(D)</span> 前往 node 2 <span class="hljs-params">(B)</span><br>|<br>-  V   <span class="hljs-params">(R)</span>   P   <span class="hljs-params">(L)</span>   V<br>|<br>- # node 2 <span class="hljs-params">(B)</span> 前往 node 3 <span class="hljs-params">(G)</span><br>|<br>-  V    R    L   <span class="hljs-params">(L)</span>   V<br>|<br>- # node 3 <span class="hljs-params">(G)</span> 前往 node 4 <span class="hljs-params">(E)</span><br>|<br>-  V   <span class="hljs-params">(R)</span>   P   <span class="hljs-params">(L)</span>   V<br>|<br>- # node 4 <span class="hljs-params">(E)</span> 前往 node 5 <span class="hljs-params">(H)</span><br>|<br>-  V    R   <span class="hljs-params">(L)</span>   V<br>|<br>- # node 5 <span class="hljs-params">(H)</span> 前往 node 6 <span class="hljs-params">(A)</span><br>|<br>-  V   <span class="hljs-params">(R)</span>   P  <span class="hljs-params">(LVR)</span>  P  <span class="hljs-params">(LVR)</span>  P  <span class="hljs-params">(L)</span>  V<br>|<br>- # node 6 <span class="hljs-params">(A)</span> 前往 node 7 <span class="hljs-params">(F)</span><br>|<br>-  V    R    L    V<br>|<br>- # node 7 <span class="hljs-params">(F)</span> 前往 node 8 <span class="hljs-params">(I)</span><br>|<br>-  V    R   <span class="hljs-params">(L)</span>   V<br>|<br>- # node 8 <span class="hljs-params">(I)</span> 前往 node 9 <span class="hljs-params">(C)</span><br>|<br>-  V   <span class="hljs-params">(R)</span>   P  <span class="hljs-params">(LVR)</span>  P   <span class="hljs-params">(L)</span>   V<br>|<br>- # node 9 <span class="hljs-params">(C)</span> 前往 null<br>|<br>-  V   <span class="hljs-params">(R)</span>   P  <span class="hljs-params">(LVR)</span>  <span class="hljs-params">(P)</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="觀察『共同性』-4"><a href="#觀察『共同性』-4" class="headerlink" title="觀察『共同性』"></a>觀察『共同性』</h4><p>從中序規則 L-V-R 和上方序列，我們可以知道，節點訪問 Visiting 完畢的下一步就是右子樹的尋訪 R</p>
+<p>而由於二元樹的特性只有至多 2 個子節點，因此我們可以很清楚知道右子樹的尋訪 R，存在 2 種情況</p>
+<ul>
+<li>右子樹存在，前往</li>
+<li>右子樹不存在，L-V-R 結束，表示子樹尋訪完畢，退回父節點</li>
+</ul>
+<h4 id="建構『代碼』-4"><a href="#建構『代碼』-4" class="headerlink" title="建構『代碼』"></a>建構『代碼』</h4><p>至此，讓我們先將代碼建構出來</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-keyword">function</span> inOrderSuccessor (current) &#123;<br>    <span class="hljs-regexp">//</span> 右子樹存在<br>    <span class="hljs-keyword">if</span> (current.rightChild) &#123;<br>        <span class="hljs-regexp">//</span>...<br>    &#125;<br>    <span class="hljs-regexp">//</span> 右子樹不存在<br>    let successor = current.parent;<br><br>    <span class="hljs-regexp">//</span>...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="紀錄『序列』-5"><a href="#紀錄『序列』-5" class="headerlink" title="紀錄『序列』"></a>紀錄『序列』</h4><p>上一輪的代碼建構，並未實現 Visiting 節點訪問，因此我們仍繼續保留序列，加上垂直線紀錄我們觀察的進度</p>
+<p><img src="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/in-order.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs 1c">- <span class="hljs-meta"># node 1 (D) 前往 node 2 (B)</span><br><span class="hljs-string">|</span><br>-  V   (R)   P  <span class="hljs-string">| (L)   V</span><br><span class="hljs-string">|</span><br>- <span class="hljs-meta"># node 2 (B) 前往 node 3 (G)</span><br><span class="hljs-string">|</span><br>-  V    R  <span class="hljs-string">|  L   (L)   V</span><br><span class="hljs-string">|</span><br>- <span class="hljs-meta"># node 3 (G) 前往 node 4 (E)</span><br><span class="hljs-string">|</span><br>-  V   (R)   P <span class="hljs-string">|  (L)   V</span><br><span class="hljs-string">|</span><br>- <span class="hljs-meta"># node 4 (E) 前往 node 5 (H)</span><br><span class="hljs-string">|</span><br>-  V    R  <span class="hljs-string">| (L)   V</span><br><span class="hljs-string">|</span><br>- <span class="hljs-meta"># node 5 (H) 前往 node 6 (A)</span><br><span class="hljs-string">|</span><br>-  V   (R)   P <span class="hljs-string">| (LVR)  P  (LVR)  P  (L)  V</span><br><span class="hljs-string">|</span><br>- <span class="hljs-meta"># node 6 (A) 前往 node 7 (F)</span><br><span class="hljs-string">|</span><br>-  V    R  <span class="hljs-string">|  L    V</span><br><span class="hljs-string">|</span><br>- <span class="hljs-meta"># node 7 (F) 前往 node 8 (I)</span><br><span class="hljs-string">|</span><br>-  V    R  <span class="hljs-string">| (L)   V</span><br><span class="hljs-string">|</span><br>- <span class="hljs-meta"># node 8 (I) 前往 node 9 (C)</span><br><span class="hljs-string">|</span><br>-  V   (R)   P <span class="hljs-string">| (LVR)  P   (L)   V</span><br><span class="hljs-string">|</span><br>- <span class="hljs-meta"># node 9 (C) 前往 null</span><br><span class="hljs-string">|</span><br>-  V   (R)   P <span class="hljs-string">| (LVR)  (P)</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="觀察『共同性』-5"><a href="#觀察『共同性』-5" class="headerlink" title="觀察『共同性』"></a>觀察『共同性』</h4><p>根據中序 L-V-R 規則，我們知道，一個節點的尋訪最優先執行的就是左子樹的前往</p>
+<p>換句話說，當我們前往一個節點時，我們就會不斷地檢查該節點的左子樹、的左子樹、的左子樹<br>，直到左子樹不存在，我們才得以進行 L-V-R 規則中的 V</p>
+<p>綜合先前結果，我們做出以下結論</p>
+<ul>
+<li>右子樹存在，前往並且找到最左的左子樹進行訪問 V</li>
+</ul>
+<h4 id="建構『代碼』-5"><a href="#建構『代碼』-5" class="headerlink" title="建構『代碼』"></a>建構『代碼』</h4><p>讓我們將剛剛未完成的代碼補上</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs reasonml"><span class="hljs-keyword">function</span> inOrderSuccessor (current) &#123;<br>    <span class="hljs-keyword">if</span> (current.rightChild) &#123;<br>        <span class="hljs-comment">// 找到最左的左子樹</span><br>        return left<span class="hljs-constructor">Most(<span class="hljs-params">current</span>.<span class="hljs-params">rightChild</span>)</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">let</span> successor = current.parent;<br><br>    <span class="hljs-comment">//...</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>此處，補充下 <code>leftMost (current)</code> 函式（找出節點最左的左子樹根節點）</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">function</span> leftMost (<span class="hljs-keyword">current</span>) &#123;<br>    // 不斷確認左子樹是否存在並前往<br>    <span class="hljs-keyword">while</span> (<span class="hljs-keyword">current</span>.leftChild) &#123;<br>        <span class="hljs-keyword">current</span> = <span class="hljs-keyword">current</span>.leftChild;<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-keyword">current</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="紀錄『序列』-6"><a href="#紀錄『序列』-6" class="headerlink" title="紀錄『序列』"></a>紀錄『序列』</h4><p>上一輪的演算法設計，我們已經處理完『右子樹存在』的情況，就是找尋最左的左子樹，並且進行訪問。因此，讓我們去除已完成的部分，簡化下序列</p>
+<p><img src="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/in-order.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs erlang">- # node 1 <span class="hljs-params">(D)</span> 前往 node 2 <span class="hljs-params">(B)</span><br>|<br>-  V   <span class="hljs-params">(R)</span>   P  | <span class="hljs-params">(L)</span>   V<br>|<br>- # node 3 <span class="hljs-params">(G)</span> 前往 node 4 <span class="hljs-params">(E)</span><br>|<br>-  V   <span class="hljs-params">(R)</span>   P |  <span class="hljs-params">(L)</span>   V<br>|<br>- # node 5 <span class="hljs-params">(H)</span> 前往 node 6 <span class="hljs-params">(A)</span><br>|<br>-  V   <span class="hljs-params">(R)</span>   P | <span class="hljs-params">(LVR)</span>  P  <span class="hljs-params">(LVR)</span>  P  <span class="hljs-params">(L)</span>  V<br>|<br>- # node 8 <span class="hljs-params">(I)</span> 前往 node 9 <span class="hljs-params">(C)</span><br>|<br>-  V   <span class="hljs-params">(R)</span>   P | <span class="hljs-params">(LVR)</span>  P   <span class="hljs-params">(L)</span>   V<br>|<br>- # node 9 <span class="hljs-params">(C)</span> 前往 null<br>|<br>-  V   <span class="hljs-params">(R)</span>   P | <span class="hljs-params">(LVR)</span>  <span class="hljs-params">(P)</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="觀察『共同性』-6"><a href="#觀察『共同性』-6" class="headerlink" title="觀察『共同性』"></a>觀察『共同性』</h4><p>剩下的情況，都是『右子樹不存在』，而中序規則 L-V-R，右子樹的檢查完畢，所代表的意義就是當前子樹已尋訪完畢</p>
+<p>因此，下一步要做的就是退回父節點，看看還有沒有尚未尋訪的部分</p>
+<p>父節點的退回，由於二元樹的特性，同樣存在 2 種情況</p>
+<ul>
+<li>由左子樹退回父節點</li>
+<li>由右子樹退回父節點</li>
+</ul>
+<p>這 2 種情況我們也可以在序列中觀察到，分別就是『P (L)』和『P (LVR)』，同時我們觀察到後者有出現重複執行的現象，前者則是執行完就進行節點訪問 V</p>
+<p>讓我們從 L-V-R 規則思考，就可以理解原因了</p>
+<ul>
+<li><p>由左子樹退回父節點，的另一層含義就是對於該父節點，左子樹已尋訪完畢；那麼根據 L-V-R 規則，我們知道當左子樹的前往 L 都執行完畢，下一步就是節點的訪問 V</p>
+</li>
+<li><p>由右子樹退回父節點，同樣也表示右子樹已尋訪完畢；根據 L-V-R 規則，我們知道右子樹的前往是最後一步，表示當前子樹也已尋訪完畢，因此我們就繼續往父節點的方向退回</p>
+</li>
+</ul>
+<p>上述就是，序列現象的成因</p>
+<p>因此我們可以做出這樣的結論</p>
+<ul>
+<li>只要是『從右子樹退回』，那麼就繼續往父節點方向移動</li>
+<li>只要是『從左子樹退回』，那麼我們就進行節點訪問</li>
+</ul>
+<h4 id="建構『代碼』-6"><a href="#建構『代碼』-6" class="headerlink" title="建構『代碼』"></a>建構『代碼』</h4><p>至此，根據我們的結論，來建構出剩下未完成的代碼</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">function</span> inOrderSuccessor (<span class="hljs-keyword">current</span>) &#123;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">current</span>.rightChild) &#123;<br>        <span class="hljs-keyword">return</span> leftMost(<span class="hljs-keyword">current</span>.rightChild);<br>    &#125;<br><br>    let successor = <span class="hljs-keyword">current</span>.parent;<br>    // 從右子樹退回，就繼續往父節點方向退<br>    <span class="hljs-keyword">while</span> (successor != <span class="hljs-keyword">null</span> &amp;&amp; successor.rightChild === <span class="hljs-keyword">current</span>) &#123;<br>        <span class="hljs-keyword">current</span> = successor;<br>        successor = <span class="hljs-keyword">current</span>.parent;<br>    &#125; <br>    // 從左子樹退回，就進行節點訪問<br>    <span class="hljs-keyword">return</span> successor;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="inOrderByParent-node-1"><a href="#inOrderByParent-node-1" class="headerlink" title="inOrderByParent (node)"></a>inOrderByParent (node)</h3><p>上述，我們完成了前置作業，讓我們接著完成中序尋訪（非遞迴版本）吧</p>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-keyword">function</span> <span class="hljs-title function_">inOrderByParent</span> (<span class="hljs-params">node</span>) &#123;<br>    let current = leftMost(node);<br><br>    <span class="hljs-keyword">while</span> (current) &#123;<br>        <span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span>(<span class="hljs-string">` <span class="hljs-subst">$&#123;current.data&#125;</span> `</span>); <span class="hljs-comment">// Visiting</span><br>        current = inOrderSuccessor(current); <span class="hljs-comment">// Traversal</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="演算法實作『後序』"><a href="#演算法實作『後序』" class="headerlink" title="演算法實作『後序』"></a>演算法實作『後序』</h2><h3 id="postOrder-node-1"><a href="#postOrder-node-1" class="headerlink" title="postOrder (node)"></a>postOrder (node)</h3><p>使用『遞迴 recursion』的概念即可快速的實作出，後序演算法。</p>
+<p>為求效能、彈性接著會在實作 <code>postOrderByParent (node)</code> 來完成同樣效果的演算法。</p>
+<p>我們知道後序尋訪優先順序是</p>
+<ol>
+<li>L: 向左子樹移動</li>
+<li>R: 向右子樹移動</li>
+<li>V: 訪問</li>
+</ol>
+<p>至此，讓我們將代碼建構出來</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">function postOrder (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">    if</span> (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">        preOrder</span>(node.leftChild);<br>        preOrder(node.rightChild);<br>        console.log(` This <span class="hljs-keyword">node</span><span class="hljs-title">&#x27;s</span> data: $&#123;node.data&#125;`);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>通過依照後序尋訪的優先順序進行『遞回』呼叫，來達成『推疊 stack』先進後出的效果，即可完成。</p>
+<blockquote>
+<p>if 判斷式用來作為『遞回』的結束條件</p>
+</blockquote>
+<h3 id="postOrderSuccessor-current-1"><a href="#postOrderSuccessor-current-1" class="headerlink" title="postOrderSuccessor (current)"></a>postOrderSuccessor (current)</h3><p>遞迴（recursion）形式的尋訪，將『節點的訪問』和『尋訪』耦合再一起，在某些時候需要有不同形式的節點訪問時，必須每次都重寫一個函式。</p>
+<p>因此，為了將 Visiting 行為獨立開來，我們需要實現非遞迴版本的演算法</p>
+<blockquote>
+<p>引用整理自 <a target="_blank" rel="noopener" href="http://alrightchiu.github.io/SecondRound/pages/about.html">Chiu CC</a> 內文：</p>
+</blockquote>
+<p>而在實現非遞迴版本的尋訪前，我們需要建立一個函式來指出『下一個節點的位置』</p>
+<p>讓我們依照前面提到的演算法設計階段來一步步建構出我們的代碼</p>
+<h4 id="紀錄『序列』-7"><a href="#紀錄『序列』-7" class="headerlink" title="紀錄『序列』"></a>紀錄『序列』</h4><p>讓我們思考下 postOrderSuccessor 函式的需求</p>
+<ul>
+<li>輸入：任意二元樹中的節點</li>
+<li>輸出：下一個節點的位置</li>
+</ul>
+<p>換句話說，在 L-R-V 優先順序中，我們會從特定節點訪問完畢『出發』，找到下一個節點訪問完畢『結束』</p>
+<p>因此，我們紀錄的每個序列將會是以 V 開頭，V 結尾</p>
+<p><img src="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/post-order.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs erlang">- # node 1 <span class="hljs-params">(D)</span> 前往 node 2 <span class="hljs-params">(G)</span><br>|<br>-  V    P   <span class="hljs-params">(L)</span>   R    L    <span class="hljs-params">(LR)</span>   V<br>|<br>- # node 2 <span class="hljs-params">(G)</span> 前往 node 3 <span class="hljs-params">(H)</span><br>|<br>-  V    P   <span class="hljs-params">(L)</span>   R   <span class="hljs-params">(LR)</span>   V<br>|<br>- # node 3 <span class="hljs-params">(H)</span> 前往 node 4 <span class="hljs-params">(E)</span><br>|<br>-  V    P   <span class="hljs-params">(LR)</span>  V  <br>|<br>- # node 4 <span class="hljs-params">(E)</span> 前往 node 5 <span class="hljs-params">(B)</span><br>|<br>-  V    P   <span class="hljs-params">(LR)</span>  V<br>|<br>- # node 5 <span class="hljs-params">(B)</span> 前往 node 6 <span class="hljs-params">(I)</span><br>|<br>-  V    P   <span class="hljs-params">(L)</span>   R    L    <span class="hljs-params">(L)</span>   R   <span class="hljs-params">(LR)</span>   V<br>|<br>- # node 6 <span class="hljs-params">(I)</span> 前往 node 7 <span class="hljs-params">(F)</span><br>|<br>-  V    P   <span class="hljs-params">(LR)</span>  V<br>|<br>- # node 7 <span class="hljs-params">(F)</span> 前往 node 8 <span class="hljs-params">(C)</span><br>|<br>-  V    P   <span class="hljs-params">(LR)</span>  V<br>|<br>- # node 8 <span class="hljs-params">(C)</span> 前往 node 9 <span class="hljs-params">(A)</span><br>|<br>-  V    P   <span class="hljs-params">(LR)</span>  V<br>|<br>- # node 9 <span class="hljs-params">(A)</span> 前往 null<br>|<br>-  V    P   <span class="hljs-params">(LR)</span> <span class="hljs-params">(V)</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="觀察『共同性』-7"><a href="#觀察『共同性』-7" class="headerlink" title="觀察『共同性』"></a>觀察『共同性』</h4><p>從後序規則 L-R-V 和上面的序列，我們可以知道，節點的訪問 V 所代表的意義為『當前子樹的尋訪完畢』，因此下一步就是『返回父節點』</p>
+<p>由於二元樹的特性（2 個子節點），因此返回父節點同樣存在 2 種情況</p>
+<ul>
+<li>由左子樹返回，根據 L-R-V 規則，左子樹的尋訪完畢，接著就是前往右子樹</li>
+<li>由右子樹返回，根據 L-R-V 規則，右子樹的尋訪完畢，接著就是進行節點訪問</li>
+</ul>
+<p>因此，我們可得到這樣的結論</p>
+<ul>
+<li>右子樹返回，我們就進行節點訪問</li>
+<li>左子樹返回，另外處理</li>
+</ul>
+<h4 id="建構『代碼』-7"><a href="#建構『代碼』-7" class="headerlink" title="建構『代碼』"></a>建構『代碼』</h4><p>至此，讓我們建構出代碼</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-keyword">function</span> postOrderSuccessor (current) &#123;<br>    let successor = current.parent;<br><br>    <span class="hljs-regexp">//</span> 父節點不存在（表示已回到根節點）<br>    <span class="hljs-keyword">if</span> (!successor) &#123;<br>        return successor;<br>    &#125;<br><br>    <span class="hljs-regexp">//</span> 父節點存在<br>    <span class="hljs-regexp">//</span> 由右子樹返回，我們就進行節點訪問<br>    <span class="hljs-keyword">if</span> (successor.righChild === current) &#123;<br>        return successor;<br>    &#125;<br><br>    <span class="hljs-regexp">//</span> 左子樹返回，另外處理<br>    <span class="hljs-regexp">//</span>...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="紀錄『序列』-8"><a href="#紀錄『序列』-8" class="headerlink" title="紀錄『序列』"></a>紀錄『序列』</h4><p>讓我們再次紀錄序列，序列圖和上面一致，並無更動</p>
+<p><img src="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/post-order.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight erlang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs erlang">- # node 1 <span class="hljs-params">(D)</span> 前往 node 2 <span class="hljs-params">(G)</span><br>|<br>-  V    P   <span class="hljs-params">(L)</span>   R    L    <span class="hljs-params">(LR)</span>   V<br>|<br>- # node 2 <span class="hljs-params">(G)</span> 前往 node 3 <span class="hljs-params">(H)</span><br>|<br>-  V    P   <span class="hljs-params">(L)</span>   R   <span class="hljs-params">(LR)</span>   V<br>|<br>- # node 3 <span class="hljs-params">(H)</span> 前往 node 4 <span class="hljs-params">(E)</span><br>|<br>-  V    P   <span class="hljs-params">(LR)</span>  V  <br>|<br>- # node 4 <span class="hljs-params">(E)</span> 前往 node 5 <span class="hljs-params">(B)</span><br>|<br>-  V    P   <span class="hljs-params">(LR)</span>  V<br>|<br>- # node 5 <span class="hljs-params">(B)</span> 前往 node 6 <span class="hljs-params">(I)</span><br>|<br>-  V    P   <span class="hljs-params">(L)</span>   R    L    <span class="hljs-params">(L)</span>   R   <span class="hljs-params">(LR)</span>   V<br>|<br>- # node 6 <span class="hljs-params">(I)</span> 前往 node 7 <span class="hljs-params">(F)</span><br>|<br>-  V    P   <span class="hljs-params">(LR)</span>  V<br>|<br>- # node 7 <span class="hljs-params">(F)</span> 前往 node 8 <span class="hljs-params">(C)</span><br>|<br>-  V    P   <span class="hljs-params">(LR)</span>  V<br>|<br>- # node 8 <span class="hljs-params">(C)</span> 前往 node 9 <span class="hljs-params">(A)</span><br>|<br>-  V    P   <span class="hljs-params">(LR)</span>  V<br>|<br>- # node 9 <span class="hljs-params">(A)</span> 前往 null<br>|<br>-  V    P   <span class="hljs-params">(LR)</span> <span class="hljs-params">(V)</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="觀察『共同性』-8"><a href="#觀察『共同性』-8" class="headerlink" title="觀察『共同性』"></a>觀察『共同性』</h4><p>在後序 L-R-V 規則下，左子樹的前往和右子樹的前往是接連再一起的，那這是什麼意思？</p>
+<p>換句話說，一個節點會不斷地先往左子樹尋訪到盡頭，接著前往右子樹，再不斷地往左子樹尋訪，重複這樣的迴圈，直到這個盡頭不再存在右子樹可以前往，就結束了 L-R-V 規則中的 L-R，至此進行節點訪問 V</p>
+<p>因此，我們可以做出這樣的結論</p>
+<ul>
+<li>直到尋找到『葉節點』前，後序尋訪會不斷地持續下去</li>
+</ul>
+<h4 id="建構『代碼』-8"><a href="#建構『代碼』-8" class="headerlink" title="建構『代碼』"></a>建構『代碼』</h4><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-keyword">function</span> postOrderSuccessor (<span class="hljs-keyword">current</span>) &#123;<br>    let successor = <span class="hljs-keyword">current</span>.parent;<br><br>    <span class="hljs-keyword">if</span> (!successor) &#123;<br>        <span class="hljs-keyword">return</span> successor;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (successor.rightChild === <span class="hljs-keyword">current</span>) &#123;<br>        <span class="hljs-keyword">return</span> successor;<br>    &#125;<br><br>    // 左子樹返回父節點，檢查父節點是否存在右子樹<br>    <span class="hljs-keyword">current</span> = successor.rightChild;<br>    <span class="hljs-keyword">while</span> (<span class="hljs-keyword">current</span>) &#123;<br>        // 找到最左子樹<br>        successor = leftMost(<span class="hljs-keyword">current</span>);<br><br>        // 前往右子樹<br>        <span class="hljs-keyword">current</span> = successor.rightChild;<br>    &#125;<br>    <br>    <span class="hljs-keyword">return</span> successor;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="postOrderByParent-node-1"><a href="#postOrderByParent-node-1" class="headerlink" title="postOrderByParent (node)"></a>postOrderByParent (node)</h3><p>前置作業完成，接者我們來建構出非遞迴版本的後續尋訪</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">function postOrderByParent (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">    let</span> current = null;<br>    <br>    while (<span class="hljs-keyword">node</span><span class="hljs-title">) &#123;</span><br><span class="hljs-title">        current</span> = <span class="hljs-keyword">node</span><span class="hljs-title">;</span><br><span class="hljs-title">        node</span> = leftMost(current);<br><br>        current = <span class="hljs-keyword">node</span><span class="hljs-title">;</span><br><span class="hljs-title">        node</span> = current.rightChild;<br>    &#125;<br><br>    while (current) &#123;<br>        console.log(` $&#123;current.data&#125; `); // Visiting<br>        current = postOrderSuccessor(current); // Traversal<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="層序-Level-order"><a href="#層序-Level-order" class="headerlink" title="層序 Level-order"></a>層序 Level-order</h2><p>一開始所提到的 Full Binary Tree 和 Complete Binary Tree 即是以層序的方式安排節點</p>
+<ul>
+<li>層序：從根節點開始，由上至下，由左至右尋訪</li>
+</ul>
+<p>在層序的演算法實作上，我們會用到『佇列 queue』的概念；佇列是一種抽象的（概念性）的資料結構，具有『先進先出』的特性</p>
+<p>讓我們開始建構代碼</p>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-keyword">function</span> <span class="hljs-title function_">levelOrder</span> (<span class="hljs-params">root</span>) &#123;<br>    <span class="hljs-comment">// 建立一個陣列</span><br>    const queue = [];<br><br>    <span class="hljs-comment">// 將根節點加入佇列</span><br>    queue.<span class="hljs-built_in">push</span>(root);<br><br>    <span class="hljs-comment">// 檢查佇列是否為空，為空表示尋訪完畢</span><br>    <span class="hljs-keyword">while</span> (queue.<span class="hljs-built_in">length</span> !== <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-comment">// 從頭（最早加入的）取出資料 </span><br>        let current = queue.shift();<br><br>        <span class="hljs-comment">// 節點訪問 Visiting</span><br>        <span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span>(<span class="hljs-string">` <span class="hljs-subst">$&#123;current.data&#125;</span>`</span>);<br><br>        <span class="hljs-comment">// Level 是由左至右，因此先將左子節點加入佇列</span><br>        <span class="hljs-keyword">if</span> (current.leftChild !== <span class="hljs-literal">null</span>)<br>            queue.<span class="hljs-built_in">push</span>(current.leftChild);<br>        <br>        <span class="hljs-comment">// 再將右子節點加入佇列</span><br>        <span class="hljs-keyword">if</span> (current.rightChild !== <span class="hljs-literal">null</span>)<br>            queue.<span class="hljs-built_in">push</span>(current.rightChild);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>至此，就可以達成層層、並且由左至右訪問樹的節點</p>
+<h2 id="JavaScript-代碼檔案"><a href="#JavaScript-代碼檔案" class="headerlink" title="JavaScript 代碼檔案"></a>JavaScript 代碼檔案</h2><p><a href="code/binary-tree.js">二元樹演算法實作（上）：binary-tree.js</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/javascript-structure-tree/">#javascript, structure, tree</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JavaScript 二元樹：前序、中序、後序、層序演算法（上）</div>
+      <div>http://example.com/2022/04/05/JavaScript-二元樹：前序、中序、後序、層序演算法（上）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Chen Po Yu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>April 5, 2022</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/" title="JavaScript 世界起源上（原型鏈）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JavaScript 世界起源上（原型鏈）</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/03/26/JavaScript-%E5%AF%A6%E4%BD%9C%E8%B3%87%E6%96%99%E7%B5%90%E6%A7%8B%EF%BC%9A%E6%A8%B9%EF%BC%8C%E5%9F%BA%E7%A4%8E%E8%A7%80%E5%BF%B5/" title="JavaScript 實作資料結構：樹，基礎觀念">
+                        <span class="hidden-mobile">JavaScript 實作資料結構：樹，基礎觀念</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

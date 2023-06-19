@@ -1,0 +1,901 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fish-favicon.png">
+  <link rel="icon" href="/img/fish-favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Chen Po Yu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言JavaScript 的原型鏈（prototype chain）對於第一次接觸且已經熟悉面向對象編程（object-oriented programming，OOP）的新手，可能會感到困惑。 JavaScript 的設計者 Brendan Erich 選擇以一種截然不同的方式，來設計 OOP 中的『繼承 inheritance』，這樣選擇的初衷究竟是什麼？推薦可以看下 JavaScript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript 世界起源上（原型鏈）">
+<meta property="og:url" content="http://example.com/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/index.html">
+<meta property="og:site_name" content="pyshif blog">
+<meta property="og:description" content="前言JavaScript 的原型鏈（prototype chain）對於第一次接觸且已經熟悉面向對象編程（object-oriented programming，OOP）的新手，可能會感到困惑。 JavaScript 的設計者 Brendan Erich 選擇以一種截然不同的方式，來設計 OOP 中的『繼承 inheritance』，這樣選擇的初衷究竟是什麼？推薦可以看下 JavaScript">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/object-layout.png">
+<meta property="og:image" content="http://example.com/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/regular.png">
+<meta property="og:image" content="http://example.com/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/full.png">
+<meta property="article:published_time" content="2022-04-16T02:23:10.000Z">
+<meta property="article:modified_time" content="2023-06-19T09:38:54.477Z">
+<meta property="article:author" content="Chen Po Yu">
+<meta property="article:tag" content="javascript, prototype, this, function">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/object-layout.png">
+  
+  
+  
+    <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-LG5KBKG5S0"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date());
+gtag("config", "G-LG5KBKG5S0"); </script>
+  
+  <title>JavaScript 世界起源上（原型鏈） - pyshif blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  <link rel="stylesheet" href="/css/about-avatar.css" />
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Web Learning</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/your-advice/">
+                <i class="iconfont icon-pen"></i>
+                Your Advice
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JavaScript 世界起源上（原型鏈）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-04-16 02:23" pubdate>
+          April 16, 2022 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          12k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          97 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">JavaScript 世界起源上（原型鏈）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <!-- // FIXME: JavaScript 世界起源上下，文章連結加上 -->
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>JavaScript 的原型鏈（prototype chain）對於第一次接觸且已經熟悉面向對象編程（object-oriented programming，OOP）的新手，可能會感到困惑。</p>
+<p>JavaScript 的設計者 Brendan Erich 選擇以一種截然不同的方式，來設計 OOP 中的『繼承 inheritance』，這樣選擇的初衷究竟是什麼？推薦可以看下 <a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2011/06/designing_ideas_of_inheritance_mechanism_in_javascript.html">JavaScript 繼承機制設計思想｜阮一峰的網路日誌</a></p>
+<blockquote>
+<p>JavaScript 以下簡稱 JS</p>
+</blockquote>
+<p>那麼，究竟差別在哪？</p>
+<p>讓我們從 <a href="">JavaScript 世界起源上</a><a href="">、下</a> 一步步藉著代碼、和想像力來認識『JS 中的原型鏈（prototype chain）』</p>
+<p>在本章節進入『原型鏈』的部分前，有些前置知識我們需要先建立起來，所以我們會先帶你了解：</p>
+<ul>
+<li><a href="#OOP-%E5%B8%B8%E8%A6%8B%E7%9A%84%E8%A1%93%E8%AA%9E%E4%BB%8B%E7%B4%B9%EF%BC%9Aclass%E3%80%81instance%E3%80%81object-%E6%98%AF%E4%BB%80%E9%BA%BC%EF%BC%9F%E6%8A%BD%E8%B1%A1%EF%BC%9F%E5%85%B7%E9%AB%94%EF%BC%9F">OOP 常見的術語介紹：class、instance、object 是什麼？抽象？具體？</a></li>
+<li><a href="#%E4%BB%80%E9%BA%BC%E6%98%AF-Function%EF%BC%9F%E4%BB%A5%E5%8F%8A-call-%E3%80%81apply-%E3%80%81bind-%E5%92%8C-this-%E7%9A%84%E9%97%9C%E4%BF%82">什麼是 Function？ 以及 call()、apply()、bind() 和 this 的關係</a></li>
+<li><a href="#%E5%BB%BA%E6%A7%8B%E5%BC%8F-Constructor-%E5%92%8C-new-%E9%81%8B%E7%AE%97%E5%AD%90%E7%9A%84%E9%97%9C%E4%BF%82">建構式 Constructor 和 new 運算子的關係</a></li>
+</ul>
+<p>有了上述的前置知識，我們就可以進入 JS 原型鏈的世界了！</p>
+<p>本章的原型鏈你將會了解到：</p>
+<ul>
+<li><a href="#%E6%B7%B1%E5%85%A5%E5%8E%9F%E5%9E%8B%E9%8F%88-Prototype-Chain">深入原型鏈 Prototype Chain</a></li>
+<li><a href="#%E8%A7%80%E5%BF%B5%E7%B8%BD%E7%B5%90">觀念總結</a></li>
+</ul>
+<h2 id="OOP-常見的術語介紹：class、instance、object-是什麼？抽象？具體？"><a href="#OOP-常見的術語介紹：class、instance、object-是什麼？抽象？具體？" class="headerlink" title="OOP 常見的術語介紹：class、instance、object 是什麼？抽象？具體？"></a>OOP 常見的術語介紹：class、instance、object 是什麼？抽象？具體？</h2><p>在 面向對象編程（OOP）我們常聽到幾個名詞</p>
+<ul>
+<li>類（class）</li>
+<li>實例（instance）</li>
+<li>對象（object）</li>
+</ul>
+<p>讓我們從『是否抽象』的角度來切入理解吧</p>
+<p>一件事物是否抽象，我們可以從他是否看得到、聽得到、拿得到、實際存在…等，來判斷；如果這個事物只是『概念性、不特定性』的，那麼我們說他是抽象。</p>
+<blockquote>
+<p>在判斷一件事物是否抽象，似乎不是這麼好思考，所以我們更常傾向於判斷它『是否具體』，就如上面列出的條件：『是不是看得到、實際存在…等』</p>
+</blockquote>
+<p>在 OOP 文章中，時常看見『動物』被拿來當作範例，我想大概是因為『生物分類法（界門綱目科屬種）』就是一種說明『概念性、抽象』最直覺的例子。</p>
+<p>舉例來說：當我們說『人屬 智人種』我們大概猜得到，就是在講口語的『人類』的意思，但這個人類指的是『你』還是『我』還是誰？</p>
+<p>的確，並沒有特定是『誰』，只要符合生物分類法中的描述，都可以叫做『人類』；而『我』或是『你』則是具體的，我們都實際存在，並且具有人類的特徵。</p>
+<blockquote>
+<p>OOP 是一種試圖描述真實世界樣子的程序設計思想</p>
+</blockquote>
+<p>接著，讓我們套用 OOP 的名詞來換句話說吧</p>
+<ul>
+<li>類（class)：人類</li>
+<li>實例（instance）：我 or 你 是『人類』這一抽象概念的實際例子</li>
+<li>對象（object）：我 or 你</li>
+</ul>
+<p>所以當我們在 OOP 中看見這幾個名詞我們要知道：</p>
+<ul>
+<li>類（class）是『抽象』的</li>
+<li>實例（instance）是用來形容 類 和 對象 之間的『關係』</li>
+<li>對象（object）是『具體』的</li>
+</ul>
+<blockquote>
+<p>在 OOP 中我們設計『類』，來創建出不同情境下需要的『對象』（使用 new 運算子）</p>
+</blockquote>
+<h2 id="什麼是-Function？以及-call-、apply-、bind-和-this-的關係"><a href="#什麼是-Function？以及-call-、apply-、bind-和-this-的關係" class="headerlink" title="什麼是 Function？以及 call()、apply()、bind() 和 this 的關係"></a>什麼是 Function？以及 call()、apply()、bind() 和 this 的關係</h2><p>在學習 JS 的過程中，我們常會聽見這麼一句話『JavaScript 中的所有的數據都是對象（object）』，要如何理解這句話呢？</p>
+<p>在這裡我們先將問題縮小，讓我們專注在『函式 function 是對象（object）嗎？』這件事情上。</p>
+<p>首先，答案是肯定的</p>
+<p>在查找 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">MDN 文件</a>中，我們可以看見開頭第一句話是這麼說的</p>
+<blockquote>
+<p>Every JavaScript function is actually a <code>Function</code> object.</p>
+</blockquote>
+<h3 id="JS-中的函式也是對象（object）？"><a href="#JS-中的函式也是對象（object）？" class="headerlink" title="JS 中的函式也是對象（object）？"></a>JS 中的函式也是對象（object）？</h3><p>那麼我們要如何理解、驗證這件事情呢？</p>
+<p>在開始理解、驗證前，我們思考下 OOP 中的 類（class）、實例（instance）、對象（object）在 JS 的世界中扮演著什麼樣的角色？</p>
+<p>引用整理至 <a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2011/06/designing_ideas_of_inheritance_mechanism_in_javascript.html">JavaScript 繼承機制設計思想｜阮一峰的網路日誌</a> 的內容：</p>
+<p>『1994 年當時，是 OOP 最興盛的時期，而 JS 的設計者 Brendan Eich 也因此受到了影響，JS 中的所有數據類型都是對象（object）…但是 Brendan Eich 不打算將 JS 設計成一種完整的面向對象編程語言，因此類 class 的概念並未引入 JS 中』</p>
+<p>從這樣的緣由，我們可以了解到類 class 的概念並不存在於 JS 中，自然而然『繼承 inheritance』也不存在。</p>
+<p>然而，Brendan Eich 面對 JS 中眾多的對象，思考著必須要存在一種機制能夠將之關聯起來，所以最後取而代之的是『原型繼承 prototypal inheritance』的概念。</p>
+<blockquote>
+<p>記住！在 JS 中我們談論的繼承，並非 OOP 中的『繼承 inheritance』而是 JS 自己獨有的『原型繼承 prototypal inheritance』</p>
+</blockquote>
+<p>因此，我們在 OOP 的觀念在 JS 中變成這樣</p>
+<ul>
+<li>類（class）：在 JS 中，不存在類的概念，只是原型鏈的語法糖</li>
+<li>實例（instance）：在 JS 中，我們談論 A 對象是否是 B 對象的實例時，所指的是 B 對象是否存在於 A 對象的原型鏈上方</li>
+<li>對象（object）：我們所認知的物件，具體、可以有屬性、方法</li>
+</ul>
+<blockquote>
+<p>語法糖：指的是對語言功能本身沒有任何影響，但是這樣的語法可以更容易被使用，讓程序編寫可以更簡潔，擁有更高的可讀性</p>
+</blockquote>
+<h3 id="驗證"><a href="#驗證" class="headerlink" title="驗證"></a>驗證</h3><p>那麼，回到正題『函式 function 是對象（object）嗎？』，這件事要如何驗證呢？</p>
+<p>讓我們使用 <code>typeof</code> 和 <code>instanceof</code> 這兩個 JS 語法來驗證這件事情吧</p>
+<ul>
+<li><code>typeof</code> 可以知道後方連接的對象（object）是什麼型別（type）</li>
+<li><code>instanceof</code> 可以知道一個對象是否是另一個對象的實例（也就是是否存在於原型鏈中）</li>
+</ul>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Data_structures">ECMAScript 標準中定義了 8 種型別</a>，7 類原始型別 primitive (Boolean、Null、Undefined、Number、BigInt、String、Symbol)和 1 類物件型別 object（object、function、array）</p>
+</blockquote>
+<p><a href="function.js">function.js</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// 創建一個繼承 Function 物件的函式</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">helloWorld</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello, world!&#x27;</span>);<br>&#125;<br><br><span class="hljs-comment">// 驗證型別</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;typeof helloWorld :&gt;&gt; &#x27;</span>, <span class="hljs-keyword">typeof</span> helloWorld); <span class="hljs-comment">// function</span><br><span class="hljs-comment">// 驗證 helloWorld 是否繼承自 Function</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;helloWorld instanceof Function :&gt;&gt; &#x27;</span>, helloWorld <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Function</span>); <span class="hljs-comment">// true</span><br><span class="hljs-comment">// 驗證 Function 是否繼承自 Object</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Function instanceof Object :&gt;&gt; &#x27;</span>, <span class="hljs-title class_">Function</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Object</span>); <span class="hljs-comment">// true</span><br><span class="hljs-comment">// 驗證 helloWorld 是否繼承 Object</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;helloWorld instanceof Object :&gt;&gt; &#x27;</span>, helloWorld <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Object</span>); <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure>
+
+<p>從上方的驗證，我們可以知道『函式 function 的確是對象（object)』。</p>
+<p>另外，我們似乎也看見了一點原型鏈的輪廓，<code>helloWorld</code> 上方接著 <code>Function</code>，<code>Function</code> 上方接著 <code>Object</code>。</p>
+<p>讓我們將這樣的輪廓記下來，待後續一步步將原型鏈這塊拼圖一片片拼湊完成。</p>
+<blockquote>
+<p>記住！這裡的輪廓並非全貌，然而作為一個旅程的開端是不錯的地圖</p>
+</blockquote>
+<h3 id="Function-原型方法：-call-、apply-、bind-和-this"><a href="#Function-原型方法：-call-、apply-、bind-和-this" class="headerlink" title="Function 原型方法： call()、apply()、bind() 和 this"></a><code>Function</code> 原型方法： <code>call()</code>、<code>apply()</code>、<code>bind()</code> 和 <code>this</code></h3><p>現在，我們理解 JS 中『函式也是物件』這件事了，接著讓我們來看一下函式作為一個『物件』的幾個和 <code>this</code> 有關的重要方法（method）。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">Function | MDN 文件</a></p>
+</blockquote>
+<p><code>this</code> 在其他 OOP 語言中（ex. C++）並不難，就是一個指向實例本身自己的指標，至始至終不會改變；然而，在 JS 中 <code>this</code> 卻不是固定指向物件本身。</p>
+<p>讓我們先記住一個 <code>this</code> 的重要觀念</p>
+<blockquote>
+<p>在大部分的情況下，當談論到『物件』時，<code>this</code> 才具有意義；想知道一個函式的 <code>this</code> 指向哪個物件，就思考是誰呼叫（invoke）了這個函式（推薦閱讀 <a target="_blank" rel="noopener" href="https://blog.huli.tw/2019/02/23/javascript-what-is-this/">淺談 JavaScript 頭號難題 this：絕對不完整，但保證好懂｜Huli</a>）</p>
+</blockquote>
+<p>讓我來做些實驗（以下實驗均在『嚴格模式』環境下執行；ES6 後默認使用嚴格模式）</p>
+<p><a href="this.js">this.js</a></p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-regexp">//</span> 定義一個全域變數 name（觀察待會函式的呼叫會不會打印出這個變數）<br>const name = <span class="hljs-string">&quot;Liz&quot;</span>;<br><br><span class="hljs-regexp">//</span> 定義一個物件<br>const child = &#123;<br>    <span class="hljs-regexp">//</span> 定義一個區域變數 name（觀察待會函式的呼叫會不會打印出這個變數）<br>    name: <span class="hljs-string">&#x27;Chris&#x27;</span>,<br>    hi: <span class="hljs-keyword">function</span> () &#123;<br>        console.log(<span class="hljs-string">&#x27;my name is :&gt;&gt;&#x27;</span>, this.name);<br>    &#125;<br>&#125;;<br><br><span class="hljs-regexp">//</span> 讓我們將 child 中 hi 函式賦值給 aliasHi 這個址參器，製造一個分身<br>const aliasHi = child.hi;<br><br><span class="hljs-regexp">//</span> 觀察 aliasHi 和 child.hi 兩個函式的輸出<br>child.hi(); <span class="hljs-regexp">//</span> Chris<br>aliasHi(); <span class="hljs-regexp">//</span> undefined<br></code></pre></td></tr></table></figure>
+
+<p>回顧一下 <code>this</code> 的觀念『誰（物件）呼叫函式，<code>this</code> 就指向誰』</p>
+<p>因此，上面的實驗結果我們可以這樣理解</p>
+<ul>
+<li><code>child.hi()</code>：hi 這個函式由 child 這個物件呼叫，<code>this</code> 指向 child，所以 <code>this.name</code> 打印出來為 Chris</li>
+<li><code>aliasHi()</code>：aliasHi 沒有由任何物件呼叫，<code>this</code> 指向 undefined，所以 <code>this.name</code> 自然也是 undefined</li>
+</ul>
+<p>讓我們再加深一下 <code>this</code> 的觀念</p>
+<blockquote>
+<p>JS 中的 <code>this</code> 是由運行環境（runtime）中誰（object）去調用（invoke）這個函式決定的</p>
+</blockquote>
+<p>至此，我們來看下，下方這三個 Function 原型方法和 <code>this</code> 有什麼關係吧</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/call">Function.prototype.call()</a>：將 Function 內部的 <code>this</code> 指向 call 傳入的物件參數</li>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply">Function.prototype.apply()</a>：將 Function 內部 <code>this</code> 指向 apply 傳入的物件參數</li>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind">Function.prototype.bind()</a>：將 Function 內部 <code>this</code> 永遠綁定 bind 傳入的物件參數</li>
+</ul>
+<p>這 3 個原型方法中基本上接收的參數大致相同</p>
+<ul>
+<li>第 1 個參數：接受一個 <code>this</code>，這個 <code>this</code> 會影響 Function 內 <code>this</code> 所指向的物件是誰</li>
+<li>第 2 個參數：<code>apply</code> 接受一個陣列，<code>call</code> 和 <code>bind</code> 則是從此開始接受不特定數量（N個）參數輸入</li>
+</ul>
+<p>讓我們來編寫代碼驗證</p>
+<p><a href="call-apply-bind.js">call-apply-bind.js</a></p>
+<figure class="highlight sqf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs sqf"><span class="hljs-comment">// 編寫一個函式，給 childA 和 childB 兩物件共用</span><br>function hi(arg1 = <span class="hljs-number">1</span>, arg2 = <span class="hljs-number">2</span>, arg3 = <span class="hljs-number">3</span>) &#123;<br>    console.<span class="hljs-built_in">log</span>(<span class="hljs-string">&#x27;this.name :&gt;&gt; &#x27;</span>, this.<span class="hljs-built_in">name</span>);<br>    console.<span class="hljs-built_in">log</span>(<span class="hljs-string">&#x27;arg1 :&gt;&gt; &#x27;</span>, arg1);<br>    console.<span class="hljs-built_in">log</span>(<span class="hljs-string">&#x27;arg2 :&gt;&gt; &#x27;</span>, arg2);<br>    console.<span class="hljs-built_in">log</span>(<span class="hljs-string">&#x27;arg3 :&gt;&gt; &#x27;</span>, arg3);<br>&#125;<br><br><span class="hljs-comment">// childA 物件</span><br>const childA = &#123;<br>    <span class="hljs-built_in">name</span>: <span class="hljs-string">&#x27;Chris&#x27;</span>,<br><br>    <span class="hljs-built_in">say</span>: hi,<br>&#125;;<br><br><span class="hljs-comment">// childB 物件</span><br>const childB = &#123;<br>    <span class="hljs-built_in">name</span>: <span class="hljs-string">&#x27;Liz&#x27;</span>,<br><br>    <span class="hljs-built_in">say</span>: hi,<br>&#125;;<br><br><span class="hljs-comment">// 開始各種呼叫</span><br>childA.<span class="hljs-built_in">say</span>(); <span class="hljs-comment">// Chris, 1, 2, 3</span><br><br>childA.<span class="hljs-built_in">say</span>.<span class="hljs-built_in">call</span>(childB); <span class="hljs-comment">// Liz, 1, 2, 3</span><br><br>childA.<span class="hljs-built_in">say</span>.<span class="hljs-built_in">call</span>(childB, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>); <span class="hljs-comment">// Liz, 4, 5, 6</span><br><br>childA.<span class="hljs-built_in">say</span>.<span class="hljs-built_in">apply</span>(childB, [<span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>]); <span class="hljs-comment">// Liz, 4, 5, 6</span><br><br>const aliasChildB = childA.<span class="hljs-built_in">say</span>.bind(childB);<br><br>aliasChildB(); <span class="hljs-comment">// Liz, 4, 5, 6</span><br><br>aliasChildB(<span class="hljs-number">7</span>, <span class="hljs-number">8</span>, <span class="hljs-number">9</span>); <span class="hljs-comment">// Liz, 7, 8, 9</span><br><br>const aliasChildB2 = childA.<span class="hljs-built_in">say</span>.bind(childB, <span class="hljs-number">10</span>, <span class="hljs-number">11</span>, <span class="hljs-number">12</span>);<br><br>aliasChildB2(); <span class="hljs-comment">// Liz, 10, 11, 12</span><br><br>aliasChildB2(<span class="hljs-number">13</span>, <span class="hljs-number">14</span>, <span class="hljs-number">15</span>); <span class="hljs-comment">// Liz, 10, 11, 12</span><br></code></pre></td></tr></table></figure>
+
+<p>上面可以觀察到 2 個現象</p>
+<ul>
+<li>明明是 <code>childA</code> 呼叫 <code>say</code> 函式，在使用 <code>call</code> 和 <code>apply</code> 指定傳入 <code>childB</code> 後，函式內 <code>this</code> 改成指向 <code>childB</code>（這就是 <code>call</code> 和 <code>apply</code> 在做的事情）</li>
+<li><code>bind</code> 呼叫時，連同引數輸入的話，引數（argument）會和 <code>this</code> 一樣有綁定效果</li>
+</ul>
+<blockquote>
+<p>記住！自己思考、動手做一遍</p>
+</blockquote>
+<h2 id="建構式-Constructor-和-new-運算子的關係"><a href="#建構式-Constructor-和-new-運算子的關係" class="headerlink" title="建構式 Constructor 和 new 運算子的關係"></a>建構式 Constructor 和 new 運算子的關係</h2><p>有了前面的打底，我們接著只要理解『 JS 中物件是如何被創建出來的』後，就可以進入『原型鏈』的世界了</p>
+<p>讓我們快速複習下『原型鏈』的歷史由來</p>
+<blockquote>
+<p>『原型鏈』是來自於 JS 設計者為了解決物件（object）間關聯問題而設計的一種機制『原型繼承 Prototypal Inheritance』的產物</p>
+</blockquote>
+<p>在 JS 的世界中，雖然沒有 OOP 中 類（class）的概念，然而在創建一個新物件時，倒是有幾分相似；JS 的設計者 Brendan Erich，模仿了 OOP 語言中，使用 <code>new</code> 運算子創建物件時，會調用建構式 <code>constructor</code> 這樣的性質</p>
+<blockquote>
+<p>補充：建構式 constructor 在 JS 中，本質上就是一般的 function，為了區別是用作創建物件，所以習慣以大寫字母開頭作為識別；那麼真正做事的是誰？其實是 <code>new</code> 運算子，讓我們看下文件是如何描述 <code>new</code> 運算子做了哪些事情</p>
+</blockquote>
+<p>讓我們看下 <a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">new operator｜MDN</a> 文件中，如何描述『物件被創建的過程』</p>
+<blockquote>
+<p>The <code>new</code> keyword does the following things:</p>
+<ol>
+<li>Creates a blank, plain JavaScript object.</li>
+<li>Adds a property to the new object (<code>__proto__</code>) that links to the constructor function’s prototype object</li>
+</ol>
+<blockquote>
+<p>Note: Properties&#x2F;objects added to the construction function prototype are therefore accessible to all instances created from the constructor function (using new).</p>
+</blockquote>
+<ol start="3">
+<li>Binds the newly created object instance as the <code>this</code> context (i.e. all references to <code>this</code> in the constructor function now refer to the object created in the first step).</li>
+<li>Returns <code>this</code> if the function doesn’t return an object.</li>
+</ol>
+</blockquote>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs actionscript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">Child</span><span class="hljs-params">()</span> &#123;<br>    <span class="hljs-keyword">this</span>.name = <span class="hljs-string">&#x27;Liz&#x27;</span>;<br>    <span class="hljs-keyword">this</span>.age = <span class="hljs-number">18</span>;<br>&#125;<br><br><span class="hljs-keyword">const</span> childA = <span class="hljs-keyword">new</span> Child();<br></code></pre></td></tr></table></figure>
+
+<p>當我們如上面代碼，使用 <code>new</code> 運算子創建物件時，有幾件事情 JS 會在背後執行</p>
+<ol>
+<li>創建一個『空物件』，就像這樣 <code>&#123;&#125;</code></li>
+<li>為這個空物件增加一個屬性叫做 <code>__proto__</code>，裡面存的是『建構式』的『原型』（意思就是：<code>childA.__proto__ = Child.prototype</code>）</li>
+<li>將『建構式』中的 <code>this</code> 指向這個『新物件』，並執行建構式</li>
+<li>將 <code>this</code> 作為『建構式』的返回值返回</li>
+</ol>
+<blockquote>
+<p><code>__proto__</code> 中會存儲一個物件的原型鏈中上方是誰（object）；意思就是他是『繼承』哪一個『原型』。</p>
+</blockquote>
+<p>至此，是一個不好理解的過程，讓我們先將理解放一旁吧，來動手編寫些代碼</p>
+<blockquote>
+<p>深入閱讀系列文章 <a target="_blank" rel="noopener" href="https://javascript.info/prototypes">Prototypes, Inheritance | JavaScript.info</a></p>
+</blockquote>
+<h3 id="驗證-1"><a href="#驗證-1" class="headerlink" title="驗證"></a>驗證</h3><p><a href="constructor.js">constructor.js</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// 宣告一個建構式（constructor）</span><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">Child</span>(<span class="hljs-params">name, age</span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">age</span> = age;<br>&#125;<br><br><span class="hljs-comment">// 增加一個原型方法（所有使用 new 運算子和 Child 建構是創建的新物件都會繼承這個方法）</span><br><span class="hljs-comment">// 說是『繼承』，其實只是在原型鏈上方都會連結到這個方法</span><br><span class="hljs-title class_">Child</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">selfIntro</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;My name is :&gt;&gt;&#x27;</span>, <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span>);<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;My age is :&gt;&gt;&#x27;</span>, <span class="hljs-variable language_">this</span>.<span class="hljs-property">age</span>);<br>&#125;<br><br><span class="hljs-comment">// 創建一個繼承 Child 原型的物件</span><br><span class="hljs-keyword">const</span> childLiz = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Child</span>(<span class="hljs-string">&#x27;Liz&#x27;</span>, <span class="hljs-number">18</span>);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;------------------------------&#x27;</span>);<br><br><span class="hljs-comment">// 檢查是否有繼承原型方法</span><br>childLiz.<span class="hljs-title function_">selfIntro</span>();<br><br><span class="hljs-comment">// 用代號表示新物件，和沿著原型鏈往上方尋找</span><br><span class="hljs-keyword">const</span> A = childLiz;<br><span class="hljs-keyword">const</span> B = A.<span class="hljs-property">__proto__</span>; <span class="hljs-comment">// 等同 Object.getPrototypeOf(A);</span><br><span class="hljs-keyword">const</span> C = B.<span class="hljs-property">__proto__</span>; <span class="hljs-comment">// 等同 Object.getPrototypeOf(B);</span><br><span class="hljs-keyword">const</span> D = C.<span class="hljs-property">__proto__</span>; <span class="hljs-comment">// 等同 Object.getPrototypeOf(C);</span><br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;------------------------------&#x27;</span>);<br><br><span class="hljs-comment">// 原型鏈的組成</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;A :&gt;&gt; &#x27;</span>, A);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;B :&gt;&gt; &#x27;</span>, B);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;C :&gt;&gt; &#x27;</span>, C);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;D :&gt;&gt; &#x27;</span>, D);<br><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;------------------------------&#x27;</span>);<br><br><span class="hljs-comment">// 各個原型分別代表誰（object）</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;A === childLiz :&gt;&gt; &#x27;</span>, A === childLiz);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;B === Child.prototype :&gt;&gt; &#x27;</span>, B === <span class="hljs-title class_">Child</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;C === Object.prototype :&gt;&gt; &#x27;</span>, C === <span class="hljs-title class_">Object</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>);<br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;D === null :&gt;&gt; &#x27;</span>, D === <span class="hljs-literal">null</span>);<br></code></pre></td></tr></table></figure>
+
+<p>從上方的代碼當中，我們可以很清楚看到原型鏈一路是如何被串起來，直到 <code>null</code></p>
+<ul>
+<li>childLiz -&gt; Child.protoype -&gt; Object.prototype -&gt; null</li>
+</ul>
+<blockquote>
+<p>原型鏈的盡頭指向 <code>null</code></p>
+</blockquote>
+<p>當我們用 <code>.</code> 運算子訪問一個物件的屬性或方法，JS 就會一路沿著原型鏈中尋找，直到『找到』或是『到達 null』</p>
+<p>上面的範例，就像一個速成班的版本，先建立一個單純、正確的觀念；為什麼這樣說呢？</p>
+<p>因為完整的原型鏈的關係圖，實際上沒有這麼單純；然而，我覺得對於一開始建立觀念來說，上方才是真正重要的事情。</p>
+<h3 id="總結"><a href="#總結" class="headerlink" title="總結"></a>總結</h3><p>後續，我們將在更深入的談到完整的原型鏈關係圖；那麼現在讓我們再次加深本章的觀念</p>
+<ul>
+<li>當我們要尋找一個物件（object）是繼承自哪個原型時，我們可以訪問 <code>__proto__</code> 或是將物件放進 <code>Object.getPrototypeOf()</code></li>
+<li>『建構式 Constructor』就是一個以大寫命名開頭的一般函式，真正在為原型鏈貢獻的人是 <code>new</code> 運算子</li>
+<li>JS 在設計上，將原型存儲在『建構式的 <code>prototype</code> 屬性中』，當使用 <code>new</code> 創建物件時，會將新物件的原型鏈與之串連起來</li>
+<li>想要理解『原型 prototype』是什麼，就思考 JS 的設計者設計它的原因：『用來關聯物件（共享數據）』</li>
+</ul>
+<p>從原型鏈的種種觀念中，我們可以這樣理解幾件事情</p>
+<p>-『想要共享的數據就放在原型 prototype 中』，因此『方法（函式）』適合放在 prototype 中，實際上 <code>class</code> 語法糖也是這麼處理的<br>-『物件（object）獨有的數據就交由建構式（constructor）生成』，因此『屬性（資料）』適合交由建構式生成；換句話說，『函式』不適合放在建構式當中，會使得每個物件都再次分配記憶體空間 </p>
+<h2 id="深入原型鏈-Prototype-Chain"><a href="#深入原型鏈-Prototype-Chain" class="headerlink" title="深入原型鏈 Prototype Chain"></a>深入原型鏈 Prototype Chain</h2><p>原型鏈的歷史、基礎觀念大致講述完畢，是時候了解下完整的原型鏈關係。</p>
+<p><img src="/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/object-layout.png" srcset="/img/loading.gif" lazyload></p>
+<blockquote>
+<p>引用自 StackOverflow</p>
+</blockquote>
+<p>上圖，我想對於新手來說不是這麼好理解的一張圖，至少對於當時的自己是如此；然而，它的確清楚、完整的表達了原型鏈中物件之間的關係。</p>
+<p>那麼，究竟要從什麼樣的角度才能更好地理解、吸收呢？先讓我們看過一遍，後面再試著整理出容易理解的心理模型。</p>
+<p>首先，整張圖有 3 個部分</p>
+<ul>
+<li>左：此區表示的是被建構出來的『物件實例 instance』（也就是對 建構式 使用 <code>new</code> 運算子創建出來的物件）</li>
+<li>中：此區表示的是『建構式 constructor』（是函式，也是物件）</li>
+<li>右：此區表示的是『原型 prototype』（儲存在建構式物件當中的原型）</li>
+</ul>
+<p>區域理解後，接著了解圖中 2 種關係線</p>
+<ul>
+<li><code>__proto__</code>：表示物件在原型鏈中指向的原型是誰</li>
+<li><code>constructor</code>：表示物件本身是由哪一個『建構式』所創造出來</li>
+</ul>
+<blockquote>
+<p>圖中 <code>Foo</code> 表示我們自定義的建構式，<code>Object</code> 和 <code>Function</code> 則都是 JS 內建的</p>
+</blockquote>
+<p>至此，可以停下來自己試著理解下；接下來讓我們將上圖轉換成更容易理解的心理模型</p>
+<h3 id="建構心理模型"><a href="#建構心理模型" class="headerlink" title="建構心理模型"></a>建構心理模型</h3><p><img src="/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/regular.png" srcset="/img/loading.gif" lazyload></p>
+<p>原本的原型鏈關係圖，完整但不容易理解，因此我們做了幾項調整</p>
+<ul>
+<li>增加方向性，由上至下，由左至右，將原型鏈層級關係表達清楚</li>
+<li>將原型、建構式以集合關係表達</li>
+</ul>
+<p>那麼，讓我們開始理解下心理模型</p>
+<ul>
+<li>原型的部分使用紅色表達</li>
+<li>我們知道建構式 constructor 是函式（藍色）也是物件（綠色）；作為一個物件，擁有 prototype 屬性來存儲原型；而 prototype 屬性中擁有 constructor 屬性指向作為建構式的自己</li>
+<li>灰色、紫色區塊則是，當我們對建構式使用 <code>new</code> 運算子建構實例的過程中，會將這些實例和自己的原型做一個連結</li>
+</ul>
+<p>至此，我們的原型鏈心理模型就建構完成</p>
+<h3 id="有人說-Function-和-Object-有著不可告人的複雜關係？是怎麼回事？"><a href="#有人說-Function-和-Object-有著不可告人的複雜關係？是怎麼回事？" class="headerlink" title="有人說 Function 和 Object 有著不可告人的複雜關係？是怎麼回事？"></a>有人說 Function 和 Object 有著不可告人的複雜關係？是怎麼回事？</h3><p>上述的心理模型基本上就是原型鏈的大概了，然而我們回過頭觀察完整的原型鏈關係圖，卻有更複雜的關係</p>
+<ul>
+<li><code>Object</code> 本身的原型是 <code>Function.prototype</code></li>
+<li><code>Function</code> 本身的原型也是 <code>Function.prototype</code></li>
+</ul>
+<p>為什麼…？奇怪？也許上面這邊感受不到太直覺怪異之處，讓我們看一下下面的代碼</p>
+<p><a href="prototype.js">prototype.js</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Object instanceof Function :&gt;&gt; &#x27;</span>, <span class="hljs-title class_">Object</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Function</span>); <span class="hljs-comment">// true</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Function instanceof Object :&gt;&gt; &#x27;</span>, <span class="hljs-title class_">Function</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Object</span>); <span class="hljs-comment">// true</span><br><br></code></pre></td></tr></table></figure>
+<ul>
+<li><code>Object</code> 是 <code>Function</code> 的實例</li>
+<li><code>Function</code> 是 <code>Object</code> 的實例</li>
+</ul>
+<p>這…是什麼情況？雞生蛋，蛋生雞；為什麼有這樣的現象？</p>
+<p>造成這樣現象的原因，其實就是我們一直提到的『JS 世界中所有數據都是物件』這件事，因而衍生出『函式也是物件』這樣的情況</p>
+<p>所以，在我們看來是雞生蛋，蛋生雞，但是情況卻有些微不同之處，讓我們仔細地深入了解下吧！</p>
+<p>首先，我們思考下這裡的 <code>Object</code> 和 <code>Function</code> 是什麼？</p>
+<p>是『物件 object』這點應該毋庸置疑，然而其實也是『函式 function』，在這也可以說是『建構式 constructor』</p>
+<p>那麼，作為一個『建構式』是『函式也是物件』，自然而然繼承了『物件的原型』和『函式的原型』也不奇怪吧！</p>
+<blockquote>
+<p>JS 中的原型繼承，一次只能繼承一個物件；從心裡模型來看，所謂的『函式』繼承『物件原型』和『函式原型』，實際上的原型鏈關係其實是『函式實例 繼承函式原型』，『函式原型 繼承 物件原型』</p>
+</blockquote>
+<p>所以，讓我們多加幾行代碼</p>
+<p><a href="prototype.js">prototype.js</a></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">// 作為一個 Object() 建構式，繼承了『物件原型』和『函式原型』</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Object instanceof Object :&gt;&gt; &#x27;</span>, <span class="hljs-title class_">Object</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Object</span>); <span class="hljs-comment">// true</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Object instanceof Function :&gt;&gt; &#x27;</span>, <span class="hljs-title class_">Object</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Function</span>); <span class="hljs-comment">// true</span><br><span class="hljs-comment">// 作為一個 Function() 建構式，繼承了『物件原型』和『函式原型』</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Function instanceof Object :&gt;&gt; &#x27;</span>, <span class="hljs-title class_">Function</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Object</span>); <span class="hljs-comment">// true</span><br><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Function instanceof Function :&gt;&gt; &#x27;</span>, <span class="hljs-title class_">Function</span> <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Function</span>); <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure>
+
+<p>至此，當我們拋開 <code>instanceof</code> 前方混淆我們的 <code>Object</code> 和 <code>Function</code>，從『建構式 constructor』的角度切入理解，我們就可以了解為什麼會有看似『雞生蛋，蛋生雞』的現象</p>
+<blockquote>
+<p>從上面這樣的觀念，我們不難想像，所有的『建構式』或更直接點『函式』都擁有『物件 <code>Object.prototype</code>、函式 <code>Function.prototype</code>』兩個原型</p>
+</blockquote>
+<p>從建構心裡模型的角度來看，直接拉關聯線指向彼此似乎不是一個好的方式，所以我們將 <code>Function.prototype</code> 做一個替身單獨拉出來，讓所有原型鏈關係圖中的物件可以更清楚、容易的指向它</p>
+<p>最後，我們的心裡模型圖變成這樣</p>
+<p><img src="/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/full.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="觀念總結"><a href="#觀念總結" class="headerlink" title="觀念總結"></a>觀念總結</h2><ul>
+<li>『函式』在 JS 中既是『函式 function』也是『對象 object』；所以函式（函式原型的實例）在『原型鏈』當中同時擁有 『函式原型 <code>Function.prototype</code>』和『物件原型 <code>Object.prototype</code>』</li>
+<li>『建構式』本質上就是『函式』，創建對象的工作其實由 <code>new</code> 運算子完成</li>
+<li><code>new</code> 運算子在創建對象過程中做的 4 件事『建立空物件、連結原型鏈、<code>this</code> 指向、和返回』</li>
+<li>想知道一個函式中 <code>this</code> 指向誰，就要看在執行階段時，是誰（object）呼叫了這個函式</li>
+<li>『函式原型 <code>Function.prototype</code>』的 3 個方法『<code>call</code>、<code>apply</code>、<code>bind</code>』可以用來控制『函式內 <code>this</code> 的指向』</li>
+<li>『原型鏈』來自『原型繼承』這個機制的產物，而『原型繼承』則是被設計來將『物件』之間關聯起來（共享數據）</li>
+<li>JS 中的『原型繼承』，一個物件只能繼承一個物件</li>
+<li>JS 的世界中沒有『類 class』和『繼承 inheritance』的概念，取而代之的是『物件 object』和『原型繼承 prototypal inheritance』</li>
+</ul>
+<h2 id="參考文件"><a href="#參考文件" class="headerlink" title="參考文件"></a>參考文件</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/new">new operator - JavaScript | MDN</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.huli.tw/2021/09/29/prototype-pollution/">基於 JS 原型鏈的攻擊手法：Prototype Pollution</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.huli.tw/2017/08/27/the-javascripts-prototype-chain/">該來理解 JavaScript 的原型鍊了</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ruanyifeng.com/blog/2011/06/designing_ideas_of_inheritance_mechanism_in_javascript.html">JavaScript 繼承機制的設計思想</a></li>
+<li><a target="_blank" rel="noopener" href="https://javascript.info/prototypes">Prototypes | JavaScript.info</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/javascript-prototype-this-function/">#javascript, prototype, this, function</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JavaScript 世界起源上（原型鏈）</div>
+      <div>http://example.com/2022/04/16/JavaScript-世界起源上（原型鏈）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Chen Po Yu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>April 16, 2022</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/" title="JavaScript 世界起源下（原型鏈）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JavaScript 世界起源下（原型鏈）</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/" title="JavaScript 二元樹：前序、中序、後序、層序演算法（上）">
+                        <span class="hidden-mobile">JavaScript 二元樹：前序、中序、後序、層序演算法（上）</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

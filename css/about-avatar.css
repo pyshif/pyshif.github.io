@@ -1,0 +1,5 @@
+.about-avatar img {
+  border-radius: 0;
+  box-shadow: none;
+  object-fit: contain;
+}

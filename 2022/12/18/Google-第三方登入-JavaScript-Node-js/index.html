@@ -1,0 +1,695 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fish-favicon.png">
+  <link rel="icon" href="/img/fish-favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Chen Po Yu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言首先記錄下文章，以及實作時間均在 2022 年，作為讀者判斷資料內容時效性的參考。 初心2021 年 10 月，當時報名參加了資展國際舉辦的 前端工程師就業養成班。在課程開始後不久，馬上就收到分組以及決定期末專題製作方向的通知了。 還記得當時，第一個念頭就是想實作 Google 第三方登入，總覺能夠透過 API 穿梭在互聯網中很酷；然而，可惜的是課程的進度，以及專案時程的壓力，並沒有太多餘力好">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Google 第三方登入(JavaScript + Node.js)">
+<meta property="og:url" content="http://example.com/2022/12/18/Google-%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%85%A5-JavaScript-Node-js/index.html">
+<meta property="og:site_name" content="pyshif blog">
+<meta property="og:description" content="前言首先記錄下文章，以及實作時間均在 2022 年，作為讀者判斷資料內容時效性的參考。 初心2021 年 10 月，當時報名參加了資展國際舉辦的 前端工程師就業養成班。在課程開始後不久，馬上就收到分組以及決定期末專題製作方向的通知了。 還記得當時，第一個念頭就是想實作 Google 第三方登入，總覺能夠透過 API 穿梭在互聯網中很酷；然而，可惜的是課程的進度，以及專案時程的壓力，並沒有太多餘力好">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-12-18T02:11:00.000Z">
+<meta property="article:modified_time" content="2023-06-19T09:38:54.477Z">
+<meta property="article:author" content="Chen Po Yu">
+<meta property="article:tag" content="gsi, google">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+    <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-LG5KBKG5S0"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date());
+gtag("config", "G-LG5KBKG5S0"); </script>
+  
+  <title>Google 第三方登入(JavaScript + Node.js) - pyshif blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  <link rel="stylesheet" href="/css/about-avatar.css" />
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Web Learning</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/your-advice/">
+                <i class="iconfont icon-pen"></i>
+                Your Advice
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Google 第三方登入(JavaScript + Node.js)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-12-18 02:11" pubdate>
+          December 18, 2022 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          2.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          22 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Google 第三方登入(JavaScript + Node.js)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>首先記錄下文章，以及實作時間均在 2022 年，作為讀者判斷資料內容時效性的參考。</p>
+<h3 id="初心"><a href="#初心" class="headerlink" title="初心"></a>初心</h3><p>2021 年 10 月，當時報名參加了資展國際舉辦的 前端工程師就業養成班。在課程開始後不久，馬上就收到分組以及決定期末專題製作方向的通知了。</p>
+<p>還記得當時，第一個念頭就是想實作 Google 第三方登入，總覺能夠透過 API 穿梭在互聯網中很酷；然而，可惜的是課程的進度，以及專案時程的壓力，並沒有太多餘力好好研究第三方登入的內容。</p>
+<h3 id="沈澱"><a href="#沈澱" class="headerlink" title="沈澱"></a>沈澱</h3><p>在結束為期半年的培訓後，終於鬆了一口氣了，同學也陸續開始找尋就業機會；而我也開始思索著下一步怎麼走，同時也有了一段時間可以好好研究 Google 第三方登入。</p>
+<h3 id="碰壁"><a href="#碰壁" class="headerlink" title="碰壁"></a>碰壁</h3><p>一直以來的習慣，面對完全陌生的技術時（或是只想懶懶的學習時），就會試著找 Youtube 視頻教學，讓別人來教我怎麼做（這時候就知道學生時期在教室的幸福）。</p>
+<p>然而，很快就發現，這些視頻教學（包括 Google 官方的視頻），似乎哪裡怪怪的，是過期了嗎？意識到這點時，我大概知道只能認命的乖乖去找技術文件了！</p>
+<p>技術文件的內容的編排方式讓我花了點時間才搞懂，哪些才是需要看的。</p>
+<p>總之，簡單來說目前有 2 份，一份是在講舊版的 JS 庫串接方式、一份是新版的，如果你是新手記得不要看到舊版的。</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/identity/sign-in/web/sign-in">Goggle 第三方登入 舊版 - 只支援到 March 31, 2023</a></li>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/guides/overview">Google 第三方登入 新版</a></li>
+</ul>
+<blockquote>
+<p>舊版，雖然說支援到 2023&#x2F;03&#x2F;31，如果你的 client_id 比較新，在引入庫時要記得加上 plugin_name (文件開頭有說自己看)</p>
+</blockquote>
+<p>那麼接下來，介紹的實作方式環境如下：</p>
+<ul>
+<li>前端： HTML or JavaScript</li>
+<li>後端： Node.js</li>
+<li>實作：Google Sign In With Button</li>
+</ul>
+<p>那麼讓我們開始吧！</p>
+<h2 id="快速導覽"><a href="#快速導覽" class="headerlink" title="快速導覽"></a>快速導覽</h2><p>這個章節會簡單介紹一些概念、放上相關連結。</p>
+<p>基本上這個章節的內容，就是將原文件中重點部分抽離出來簡單介紹，所以如果你想自己動手實作，推薦自己閱讀完整的文件內容。</p>
+<h3 id="連結"><a href="#連結" class="headerlink" title="連結"></a>連結</h3><p>本文章所有關於 Google 官方技術文件連結，按照提及順序排列。</p>
+<blockquote>
+<p>巢狀表示，子連結內容你自己也可以在父連結頁面中找到。</p>
+</blockquote>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/guides/overview">Sign In with Google for Web</a><ul>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid">Setup</a></li>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/guides/choose-components">Choose Sign In With Google components for your pages</a></li>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/reference/html-reference">Refrence: HTML API</a></li>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/reference/js-reference">Refrence: JavaScript</a></li>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/guides/verify-google-id-token">Verify the Google ID token on your server side</a></li>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/guides/migration">Migrating from Google Sign-In</a>。</li>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/tools/configurator">Code Generator</a></li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="https://console.developers.google.com/apis">Google APIs console</a></li>
+<li><a target="_blank" rel="noopener" href="https://jwt.io/introduction">JWT (Json Web Token)</a></li>
+</ul>
+<h3 id="Setup"><a href="#Setup" class="headerlink" title="Setup"></a>Setup</h3><p>設定你的 <a target="_blank" rel="noopener" href="https://console.developers.google.com/apis">Google APIs console</a>，如果你還沒有帳號記得先註冊。</p>
+<p>這裡主要有 2 件事情要完成：</p>
+<ul>
+<li>在你的 <strong>Credentials</strong> 頁面中 創建屬於你的 <strong>OAtuh 2.0 Client ID</strong></li>
+<li>設定你 <strong>Client ID</strong> 的 <strong>Authorized JavaScript origins</strong> 或 <strong>Authorized redirect URIs</strong>，取決你的 UX 是採 popup 流程還是 redirect（也可以都設定）</li>
+</ul>
+<p>Client ID 會是一串代碼，在我們引用 GSI 庫時會使用到。而 <strong>Authorized JavaScript origins</strong> 我們通常會將本地環境、和正式環境的 domain 都加入；值得注意得是，本地環境記得 <code>http://localhost</code> 和 <code>http://localhost:&lt;port_number&gt;</code> 兩個都要設定。</p>
+<p>其餘的設定就是 <strong>OAuth Consent Screen</strong>，這個部分就是用來提示 你的網站使用者，你是誰、會取用哪些以及如何利用 使用者的資料。</p>
+<p>其他更近一步詳細資訊，請參考 <a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid">Setup</a></p>
+<h3 id="Load-the-client-library"><a href="#Load-the-client-library" class="headerlink" title="Load the client library"></a>Load the client library</h3><p>在你的前端網頁，以 CDN 的方式載入 <code>GSI</code> 庫（Google Identity Services）。我也不知道為什麼不叫 <code>GIS</code> 而是 <code>GSI</code>。</p>
+<blockquote>
+<p>GSI 是一個只提供給前端環境使用的庫，只能使用 CDN 方式載入。</p>
+</blockquote>
+<blockquote>
+<p>目前有 One Tap、Sign In With Button 這 2 種實作方式。這兩種差別請參考 <a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/guides/choose-components">Choose Sign In With Google components for your pages</a></p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://accounts.google.com/gsi/client&quot;</span> <span class="hljs-attr">async</span> <span class="hljs-attr">defer</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><code>GSI</code> 庫載入成功後，會在你的前端環境創建名為 <code>google</code> 的全域物件。</p>
+<p>如果你想使用 JavaScript 的方式實作，你將會使用 <code>google</code> 物件來初始化；但如果你使用 HTML 方式來實作，你可以不用理會這個物件，直接將相關資料填入指定的 <code>data-*</code> 屬性即可。</p>
+<p>這時候會需要參考到的 技術文件：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/reference/html-reference">Reference: HTML</a></li>
+<li><a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/reference/js-reference">Reference: JavaScript</a></li>
+</ul>
+<p>初始化要做的事情主要有 2 件（沒提到的請自行參考上方文件）</p>
+<blockquote>
+<p>這裡介紹的是 Google Sign In With Button 方式。One Tap 自己本身還沒實作過，請自行參考文件。</p>
+</blockquote>
+<ul>
+<li>設定你的 <strong>Client ID</strong>，這將與你的 Google APIs console 連結起來</li>
+<li>設定 UX 流程是 <strong>popup</strong> 或是 <strong>redirect</strong><ul>
+<li><strong>popup</strong>: 將使用者的 JWT 傳到前端，這時你必須設定 <code>callback</code> 來處理接收到的 Token，在自行傳到後端進行驗證、資料庫處理等。（通常用於前後端分離專案）</li>
+<li><strong>redirect</strong>: 將使用者的 JWT 導向你的後端，你可以直接在後端進行驗證、資料庫處理等。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://jwt.io/introduction">JWT (Json Web Token)</a>。如果不知道是什麼，還需要自行補上這塊背景知識。</p>
+</blockquote>
+<p>基本上到這，大概就完成了。就只剩下實作 JWT decode（自行選擇適合的庫，上方 JWT 官網有清單）、使用 <code>OAuth2Client</code> (Node.js 環境) 來驗證 Token 有效性、CSRF 防止 ⋯⋯ 等。</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>如果你想快速感覺下整個流程，推薦你使用 HTML 的方式 先實作前端的部分即可。直接將你的 <strong>Client ID</strong> 和 <strong>Callback</strong> (用來處理 Token 回傳的函式) 設定好就可以看看你拿到的 Token 長什麼樣子。</p>
+<p>如果你想了解舊版和新版的差異，文件說明在這 <a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/guides/migration">Migrating from Google Sign-In</a>。</p>
+<p>另外這裡有 HTML 實作方式的按鈕產生器，可以幫你把基本資料都填好。<a target="_blank" rel="noopener" href="https://developers.google.com/identity/gsi/web/tools/configurator">Code Generator</a>。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/gsi-google/">#gsi, google</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Google 第三方登入(JavaScript + Node.js)</div>
+      <div>http://example.com/2022/12/18/Google-第三方登入-JavaScript-Node-js/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Chen Po Yu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>December 18, 2022</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/12/26/%E6%87%B5%E6%87%82-Webpack-5-React/" title="懵懂 Webpack 5 (React)">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">懵懂 Webpack 5 (React)</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/" title="JavaScript 世界起源下（原型鏈）">
+                        <span class="hidden-mobile">JavaScript 世界起源下（原型鏈）</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

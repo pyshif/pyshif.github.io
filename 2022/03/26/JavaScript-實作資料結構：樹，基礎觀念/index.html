@@ -1,0 +1,654 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fish-favicon.png">
+  <link rel="icon" href="/img/fish-favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Chen Po Yu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="本篇文章依照自己的理解和話，整理 Chiu CC 部落格 有關於樹的一系列以 C++ 實作的文章重點。 『樹』的宏觀世界（集合關係） 依據越嚴格的定義，資料結構依序由 Graph 圖、Tree 樹、Binary Tree 二元樹、Binary Search Tree 二元搜尋樹、Red Black 紅黑樹發展。  Graph：存在 cycle 的樹，則稱作 圖。 Tree：不存在 cycle 情形">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript 實作資料結構：樹，基礎觀念">
+<meta property="og:url" content="http://example.com/2022/03/26/JavaScript-%E5%AF%A6%E4%BD%9C%E8%B3%87%E6%96%99%E7%B5%90%E6%A7%8B%EF%BC%9A%E6%A8%B9%EF%BC%8C%E5%9F%BA%E7%A4%8E%E8%A7%80%E5%BF%B5/index.html">
+<meta property="og:site_name" content="pyshif blog">
+<meta property="og:description" content="本篇文章依照自己的理解和話，整理 Chiu CC 部落格 有關於樹的一系列以 C++ 實作的文章重點。 『樹』的宏觀世界（集合關係） 依據越嚴格的定義，資料結構依序由 Graph 圖、Tree 樹、Binary Tree 二元樹、Binary Search Tree 二元搜尋樹、Red Black 紅黑樹發展。  Graph：存在 cycle 的樹，則稱作 圖。 Tree：不存在 cycle 情形">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2022/03/26/JavaScript-%E5%AF%A6%E4%BD%9C%E8%B3%87%E6%96%99%E7%B5%90%E6%A7%8B%EF%BC%9A%E6%A8%B9%EF%BC%8C%E5%9F%BA%E7%A4%8E%E8%A7%80%E5%BF%B5/tree-world.png">
+<meta property="article:published_time" content="2022-03-26T17:19:56.000Z">
+<meta property="article:modified_time" content="2023-06-19T09:38:54.485Z">
+<meta property="article:author" content="Chen Po Yu">
+<meta property="article:tag" content="javascript, structure, tree">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2022/03/26/JavaScript-%E5%AF%A6%E4%BD%9C%E8%B3%87%E6%96%99%E7%B5%90%E6%A7%8B%EF%BC%9A%E6%A8%B9%EF%BC%8C%E5%9F%BA%E7%A4%8E%E8%A7%80%E5%BF%B5/tree-world.png">
+  
+  
+  
+    <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-LG5KBKG5S0"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date());
+gtag("config", "G-LG5KBKG5S0"); </script>
+  
+  <title>JavaScript 實作資料結構：樹，基礎觀念 - pyshif blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  <link rel="stylesheet" href="/css/about-avatar.css" />
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Web Learning</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/your-advice/">
+                <i class="iconfont icon-pen"></i>
+                Your Advice
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="JavaScript 實作資料結構：樹，基礎觀念"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-03-26 17:19" pubdate>
+          March 26, 2022 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          9 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">JavaScript 實作資料結構：樹，基礎觀念</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>本篇文章依照自己的理解和話，整理 <a target="_blank" rel="noopener" href="http://alrightchiu.github.io/SecondRound/pages/about.html">Chiu CC 部落格</a> 有關於樹的一系列以 C++ 實作的文章重點。</p>
+<h2 id="『樹』的宏觀世界（集合關係）"><a href="#『樹』的宏觀世界（集合關係）" class="headerlink" title="『樹』的宏觀世界（集合關係）"></a>『樹』的宏觀世界（集合關係）</h2><p><img src="/2022/03/26/JavaScript-%E5%AF%A6%E4%BD%9C%E8%B3%87%E6%96%99%E7%B5%90%E6%A7%8B%EF%BC%9A%E6%A8%B9%EF%BC%8C%E5%9F%BA%E7%A4%8E%E8%A7%80%E5%BF%B5/tree-world.png" srcset="/img/loading.gif" lazyload></p>
+<p>依據越嚴格的定義，資料結構依序由 Graph 圖、Tree 樹、Binary Tree 二元樹、Binary Search Tree 二元搜尋樹、Red Black 紅黑樹發展。</p>
+<ul>
+<li>Graph：存在 cycle 的樹，則稱作 圖。</li>
+<li>Tree：不存在 cycle 情形，且無特別限制 child 數量的樹。</li>
+<li>Binary Tree：每個 node 只存在至多 2 個 child，稱之。</li>
+<li>Binary Search Tree (BST)：Binary Tree 再加上『鍵值大小規則限制』，稱之。</li>
+<li>Red Black Tree：以 BST 為基礎，添加顏色平衡樹高，簡短搜尋時間，稱之。</li>
+</ul>
+<h2 id="術語認識（定義）"><a href="#術語認識（定義）" class="headerlink" title="術語認識（定義）"></a>術語認識（定義）</h2><h3 id="樹"><a href="#樹" class="headerlink" title="樹"></a>樹</h3><ul>
+<li>tree：每個 node 只存在一個 parent，並且尋找特定 node 時只存在一條 path。</li>
+</ul>
+<h3 id="基礎"><a href="#基礎" class="headerlink" title="基礎"></a>基礎</h3><ul>
+<li>node：節點。</li>
+<li>edge：兩相相鄰節點之間的連線，邊。</li>
+<li>cycle：節點間，彼此互相指向，形成封閉迴圈。</li>
+</ul>
+<h3 id="節點"><a href="#節點" class="headerlink" title="節點"></a>節點</h3><ul>
+<li>parent &#x2F; child：當 A 節點指向 B 節點，則 A 為 parent，B 為 child。</li>
+<li>siblings：擁有相同 parent 的節點們。</li>
+<li>desendant：所有的 child，包括 child 的 child 都稱之為。</li>
+<li>ancestor：所有的 parent，包括 parent 的 parent 都稱之為。</li>
+<li>path：node 和 edge 組成的序列。</li>
+<li>level：root 被定義為 level 1，至此每經過一個 parent 往上加 1。</li>
+<li>height of node：height 指的是 edge 的數量。一個 node 的 hieght 為其最遠的子代中間經過的 edge 數。</li>
+<li>height of tree：height 指的是 edge 的數量。樹高即為 root 的 height。</li>
+<li>depth：depth 和 height 一樣指的是 edge 的數量；而與之不同處為，height 指的與最遠子代間經過的 edge 數，而 depth 指的是與 root 間的 edge 數。</li>
+</ul>
+<h3 id="樹的元素"><a href="#樹的元素" class="headerlink" title="樹的元素"></a>樹的元素</h3><ul>
+<li>root：樹結構中最上層的節點（parent &#x3D; NULL）</li>
+<li>degree：單一節點所擁有的子樹數量</li>
+<li>leaf &#x2F; external node：子樹數量為 0 的節點</li>
+<li>internal node：至少有 1 個子樹的節點</li>
+</ul>
+<h2 id="樹的使用"><a href="#樹的使用" class="headerlink" title="樹的使用"></a>樹的使用</h2><p>樹適合用以解決具有階層結構（hierarchical structure）的問題。</p>
+<blockquote>
+<p>階層結構：具有明確的先後次序</p>
+</blockquote>
+<h2 id="資料來源"><a href="#資料來源" class="headerlink" title="資料來源"></a>資料來源</h2><ul>
+<li><a target="_blank" rel="noopener" href="http://alrightchiu.github.io/SecondRound/treeshu-introjian-jie.html">資料結構系列介紹 (以 C++ 實作)</a></li>
+<li><a target="_blank" rel="noopener" href="http://pisces.ck.tp.edu.tw/~peng/index.php?action=showfile&file=fae2b084a5b01dda06bf7d92b9aebd18645f9edab">樹名詞介紹</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/javascript-structure-tree/">#javascript, structure, tree</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>JavaScript 實作資料結構：樹，基礎觀念</div>
+      <div>http://example.com/2022/03/26/JavaScript-實作資料結構：樹，基礎觀念/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Chen Po Yu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>March 26, 2022</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/" title="JavaScript 二元樹：前序、中序、後序、層序演算法（上）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">JavaScript 二元樹：前序、中序、後序、層序演算法（上）</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/03/26/SSH-%E9%80%A3%E7%B7%9A%E6%8C%87%E4%BB%A4/" title="SSH 連線指令">
+                        <span class="hidden-mobile">SSH 連線指令</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

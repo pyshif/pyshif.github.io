@@ -1,0 +1,761 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fish-favicon.png">
+  <link rel="icon" href="/img/fish-favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Chen Po Yu">
+  <meta name="keywords" content="">
+  
+    <meta property="og:type" content="website">
+<meta property="og:title" content="pyshif blog">
+<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:site_name" content="pyshif blog">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="Chen Po Yu">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+    <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-LG5KBKG5S0"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date());
+gtag("config", "G-LG5KBKG5S0"); </script>
+  
+  <title>pyshif blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  <link rel="stylesheet" href="/css/about-avatar.css" />
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Web Learning</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/your-advice/">
+                <i class="iconfont icon-pen"></i>
+                Your Advice
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="在探索各種可能性中，找尋一種平衡感"></span>
+          
+        </div>
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div id="board"
+          style="margin-top: 0">
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2023/02/27/SSH-%E5%AE%A2%E6%88%B6%E7%AB%AF%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%EF%BC%8F%E5%A4%9A%E4%B8%BB%E6%A9%9F%E3%80%81Git-%E5%84%B2%E5%AD%98%E5%BA%AB%E7%AE%A1%E7%90%86/" target="_self">
+          SSH 客戶端基本操作／多主機、Git 儲存庫管理
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/02/27/SSH-%E5%AE%A2%E6%88%B6%E7%AB%AF%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C%EF%BC%8F%E5%A4%9A%E4%B8%BB%E6%A9%9F%E3%80%81Git-%E5%84%B2%E5%AD%98%E5%BA%AB%E7%AE%A1%E7%90%86/" target="_self">
+        <div>
+          前言整理 SSH 連線操作方式，執行環境為 Mac 13.0 SSH 是什麼？SSH (Secure Shell) 是一種加密的網路協議，可以用來遠程連接到另一台計算機並進行管理和傳輸文件。另外，Git 遠端庫的連線也是一個很常見的使用情境。  OpenSSH 是 SSH 協議的的實作（就像 JavaScript 之於 ECMAScript）  要如何生成 SSH Key？使用 ssh-keyge
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-02-27 20:30" pubdate>
+              2023-02-27
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/git-ssh-ssh-keygen-ssh-add-ssh-agent-ssh-config/">#git, ssh, ssh-keygen, ssh-add, ssh-agent, ssh_config</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2023/01/26/%E7%90%86%E8%A7%A3-Vue-3-ref-%E5%92%8C-reactive/" target="_self">
+          理解 Vue 3 ref() 和 reactive()
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/01/26/%E7%90%86%E8%A7%A3-Vue-3-ref-%E5%92%8C-reactive/" target="_self">
+        <div>
+          前言在閱讀 Vue 3 文件中的 Reactive Fundamentals (Composition API) 時，對於文件敘述 ref() 和 reactive() 的不同有些疑惑，因此進行了一些實驗（環境：vue 3.2.45）。 結論從 Vue 3 的文件中（Reactive Fundamentals (Compisition API)）我們知道 reactive() 只能用於創建『對象類
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-01-26 02:57" pubdate>
+              2023-01-26
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/vue-ref-reactive/">#vue, ref, reactive</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2023/01/13/%E9%97%9C%E6%96%BC-JS-%E6%A8%A1%E7%B5%84%E5%8C%96%EF%BC%9ACMJ-AMD-CMD-UMD-ESM-IIFE/" target="_self">
+          關於 JS 模組化：CMJ, AMD, CMD, UMD, ESM, IIFE
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/01/13/%E9%97%9C%E6%96%BC-JS-%E6%A8%A1%E7%B5%84%E5%8C%96%EF%BC%9ACMJ-AMD-CMD-UMD-ESM-IIFE/" target="_self">
+        <div>
+          前言在看第三方工具文件、研究 JavaScript 打包工具時，總有意無意看見這類技術名詞，CommonJS、AMD、UMD、ESM⋯⋯等。 就在好好研究後，才發覺『這些知識應該作為學習打包工具前的背景知識』。那麼讓我們開始吧！ 時代背景JavaScript 語言最早是為了解決網頁能和瀏覽器之間互動的問題而被發明的，輕便、容易使用成了設計他的目的。  JavaScript modules - A
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-01-13 18:39" pubdate>
+              2023-01-13
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Module-CMJ-AMD-UMD-CMD-ESM-IIFE/">#Module, CMJ, AMD, UMD, CMD, ESM, IIFE</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/12/26/%E6%87%B5%E6%87%82-Webpack-5-React/" target="_self">
+          懵懂 Webpack 5 (React)
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/12/26/%E6%87%B5%E6%87%82-Webpack-5-React/" target="_self">
+        <div>
+          前言『網頁前端』的基礎是 HTML、CSS、JavaScript，通常情況下，很好理解和上手；然而，在某一天我們接觸了『前端框架』，可能是 Vue、React、或 Angular，突然間我們就變笨了。 學習 React 時，使用 create-react-app 這個工具，一下子就可以幫你把整個 React 開發環境建構好。接著，你只要在熟悉下 JSX 語法，很快就可以開始製作你的 SPA 網頁了
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-12-26 01:06" pubdate>
+              2022-12-26
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/webpack-react-vue-babel-bundler/">#webpack, react, vue, babel, bundler</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/12/18/Google-%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%85%A5-JavaScript-Node-js/" target="_self">
+          Google 第三方登入(JavaScript + Node.js)
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/12/18/Google-%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%85%A5-JavaScript-Node-js/" target="_self">
+        <div>
+          前言首先記錄下文章，以及實作時間均在 2022 年，作為讀者判斷資料內容時效性的參考。 初心2021 年 10 月，當時報名參加了資展國際舉辦的 前端工程師就業養成班。在課程開始後不久，馬上就收到分組以及決定期末專題製作方向的通知了。 還記得當時，第一個念頭就是想實作 Google 第三方登入，總覺能夠透過 API 穿梭在互聯網中很酷；然而，可惜的是課程的進度，以及專案時程的壓力，並沒有太多餘力好
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-12-18 02:11" pubdate>
+              2022-12-18
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/gsi-google/">#gsi, google</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/" target="_self">
+          JavaScript 世界起源下（原型鏈）
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/04/21/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8B%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/" target="_self">
+        <div>
+          前言在 JavaScript 世界起源上（原型鏈）中，我們已經介紹完原型鏈的基本觀念 有了基本的認識後，在本章我們將實際建構『原型鏈』並且實作『函式 function』和『語法糖 class』兩種方式 實際上使用 class 來創建物件，和傳統使用『函式』，仍有些微的差異，並且 class 還擁有些擴展的性質  推薦閱讀 Class basic syntax | JavaScript.info
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-04-21 03:51" pubdate>
+              2022-04-21
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/javascript-class-prototye/">#javascript, class, prototye</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/" target="_self">
+          JavaScript 世界起源上（原型鏈）
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/04/16/JavaScript-%E4%B8%96%E7%95%8C%E8%B5%B7%E6%BA%90%E4%B8%8A%EF%BC%88%E5%8E%9F%E5%9E%8B%E9%8F%88%EF%BC%89/" target="_self">
+        <div>
+          前言JavaScript 的原型鏈（prototype chain）對於第一次接觸且已經熟悉面向對象編程（object-oriented programming，OOP）的新手，可能會感到困惑。 JavaScript 的設計者 Brendan Erich 選擇以一種截然不同的方式，來設計 OOP 中的『繼承 inheritance』，這樣選擇的初衷究竟是什麼？推薦可以看下 JavaScript
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-04-16 02:23" pubdate>
+              2022-04-16
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/javascript-prototype-this-function/">#javascript, prototype, this, function</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/" target="_self">
+          JavaScript 二元樹：前序、中序、後序、層序演算法（上）
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/04/05/JavaScript-%E4%BA%8C%E5%85%83%E6%A8%B9%EF%BC%9A%E5%89%8D%E5%BA%8F%E3%80%81%E4%B8%AD%E5%BA%8F%E3%80%81%E5%BE%8C%E5%BA%8F%E3%80%81%E5%B1%A4%E5%BA%8F%E6%BC%94%E7%AE%97%E6%B3%95%EF%BC%88%E4%B8%8A%EF%BC%89/" target="_self">
+        <div>
+          本篇文章依照自己的理解和話，整理、延伸自Chiu CC 部落格 有關於樹的一系列以 C++ 實作的文章重點。 接下來簡單介紹下二元樹 Binary Tree，以及使用 JavaScript 實作出二元樹 4 種尋訪（前、中、後、層序），實作的過程會紀錄尋訪規則、資料結構、演算法設計，一直到建構代碼。 二元樹『介紹』所謂的二元樹 Binary Tree 即是除了具有原本樹 Tree 的性質外，再加上
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-04-05 16:49" pubdate>
+              2022-04-05
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/javascript-structure-tree/">#javascript, structure, tree</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/03/26/JavaScript-%E5%AF%A6%E4%BD%9C%E8%B3%87%E6%96%99%E7%B5%90%E6%A7%8B%EF%BC%9A%E6%A8%B9%EF%BC%8C%E5%9F%BA%E7%A4%8E%E8%A7%80%E5%BF%B5/" target="_self">
+          JavaScript 實作資料結構：樹，基礎觀念
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/26/JavaScript-%E5%AF%A6%E4%BD%9C%E8%B3%87%E6%96%99%E7%B5%90%E6%A7%8B%EF%BC%9A%E6%A8%B9%EF%BC%8C%E5%9F%BA%E7%A4%8E%E8%A7%80%E5%BF%B5/" target="_self">
+        <div>
+          本篇文章依照自己的理解和話，整理 Chiu CC 部落格 有關於樹的一系列以 C++ 實作的文章重點。 『樹』的宏觀世界（集合關係） 依據越嚴格的定義，資料結構依序由 Graph 圖、Tree 樹、Binary Tree 二元樹、Binary Search Tree 二元搜尋樹、Red Black 紅黑樹發展。  Graph：存在 cycle 的樹，則稱作 圖。 Tree：不存在 cycle 情形
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-03-26 17:19" pubdate>
+              2022-03-26
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/javascript-structure-tree/">#javascript, structure, tree</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/03/26/SSH-%E9%80%A3%E7%B7%9A%E6%8C%87%E4%BB%A4/" target="_self">
+          SSH 連線指令
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/03/26/SSH-%E9%80%A3%E7%B7%9A%E6%8C%87%E4%BB%A4/" target="_self">
+        <div>
+          1. SSH 加密連線方式要從 A（本地）使用 SSH 加密連線到 B（伺服器）前， 一組成對的『公、私鑰』必須分別存在 A 和 B 中。 只要 B 的 SSH Daemon 程序在運行中，A 就可以使用 SSH Client 程序發起加密連線。  SSH 預設連線端口為 22  一般的加密連線指令： 1$ ssh -i &lt;private-key&gt; &lt;user&gt;@&lt;i
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-03-26 15:23" pubdate>
+              2022-03-26
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/ssh-linux/">#ssh, linux</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+
+
+  <nav aria-label="navigation">
+    <span class="pagination" id="pagination">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+    </span>
+  </nav>
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

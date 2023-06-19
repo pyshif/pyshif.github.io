@@ -1,0 +1,701 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fish-favicon.png">
+  <link rel="icon" href="/img/fish-favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Chen Po Yu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="1. 學習終端介面操作資料庫的理由？在 XAMPP 提供的 PHP 開發環境中，我們可以輕易的搭載出 MariaDB 伺服器，同時還可以透過 PHPMyAdmin 提供的圖形化介面對資料庫進行操作。   XAMPP (Apache + MariaDB + PHP + Perl)：PHP 開發環境的組合包  當試著自己實作將網站搬到 AWS 所提供的 EC2 服務時，就面臨著要如何在全終端的介面下將">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MariaDB 終端操作（Command-Line Client）">
+<meta property="og:url" content="http://example.com/2022/03/21/MariaDB-%E7%B5%82%E7%AB%AF%E6%93%8D%E4%BD%9C%EF%BC%88Command-Line-Client%EF%BC%89/index.html">
+<meta property="og:site_name" content="pyshif blog">
+<meta property="og:description" content="1. 學習終端介面操作資料庫的理由？在 XAMPP 提供的 PHP 開發環境中，我們可以輕易的搭載出 MariaDB 伺服器，同時還可以透過 PHPMyAdmin 提供的圖形化介面對資料庫進行操作。   XAMPP (Apache + MariaDB + PHP + Perl)：PHP 開發環境的組合包  當試著自己實作將網站搬到 AWS 所提供的 EC2 服務時，就面臨著要如何在全終端的介面下將">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-03-21T22:41:16.000Z">
+<meta property="article:modified_time" content="2023-06-19T09:38:54.485Z">
+<meta property="article:author" content="Chen Po Yu">
+<meta property="article:tag" content="mysql, mariadb, linux">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+    <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-LG5KBKG5S0"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date());
+gtag("config", "G-LG5KBKG5S0"); </script>
+  
+  <title>MariaDB 終端操作（Command-Line Client） - pyshif blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  <link rel="stylesheet" href="/css/about-avatar.css" />
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Web Learning</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/your-advice/">
+                <i class="iconfont icon-pen"></i>
+                Your Advice
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="MariaDB 終端操作（Command-Line Client）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-03-21 22:41" pubdate>
+          March 21, 2022 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          3.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          28 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MariaDB 終端操作（Command-Line Client）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="1-學習終端介面操作資料庫的理由？"><a href="#1-學習終端介面操作資料庫的理由？" class="headerlink" title="1. 學習終端介面操作資料庫的理由？"></a>1. 學習終端介面操作資料庫的理由？</h2><p>在 <a target="_blank" rel="noopener" href="https://www.apachefriends.org/index.html">XAMPP</a> 提供的 PHP 開發環境中，我們可以輕易的搭載出 MariaDB 伺服器，同時還可以透過 PHPMyAdmin 提供的圖形化介面對資料庫進行操作。 </p>
+<blockquote>
+<p>XAMPP (Apache + MariaDB + PHP + Perl)：PHP 開發環境的組合包</p>
+</blockquote>
+<p>當試著自己實作將網站搬到 AWS 所提供的 EC2 服務時，就面臨著要如何在全終端的介面下將資料庫伺服器運行起來？</p>
+<p>下方文章整理自己剛從 XAMPP 環境搬移資料庫到 Linux (CentOS 7) 上需要知道的幾件事。</p>
+<p>文末附上資料庫終端操作介面的作弊表，提供快速查詢。</p>
+<blockquote>
+<p>對於網站上架，有許多解決方案（LAMP…等），這裡只紀錄自己選擇的解決方式。</p>
+</blockquote>
+<h2 id="2-前置知識"><a href="#2-前置知識" class="headerlink" title="2. 前置知識"></a>2. 前置知識</h2><h3 id="2-1-mysql-和-mariadb-這兩個指令一樣嗎？"><a href="#2-1-mysql-和-mariadb-這兩個指令一樣嗎？" class="headerlink" title="2.1 mysql 和 mariadb 這兩個指令一樣嗎？"></a>2.1 <code>mysql</code> 和 <code>mariadb</code> 這兩個指令一樣嗎？</h3><p>剛開始查詢相關資料時，許多教學文都說在終端鍵入 <code>mysql</code> 就可以進入資料庫操作介面，但我們用的明明就是 mariadb 為什麼是打 <code>mysql</code>，試著在 Mac 終端環境下打 <code>mariadb</code> 發現也可以進入，似乎有同樣的效果？</p>
+<p>讓我們看下官方文件給出的解釋。</p>
+<blockquote>
+<p><strong>MariaDB starting with 10.4.6</strong><br>From MariaDB 10.4.6, <em><code>mariadb</code> is a symlink to <code>mysql</code>, the command-line client</em>.<br>See mysql Command-Line Client for details.</p>
+<p><strong>MariaDB starting with 10.5.2</strong><br>From MariaDB 10.5.2, <em><code>mariadb</code> is the name of the command-line client, with <code>mysql</code> a symlink</em>.</p>
+</blockquote>
+<p>這邊自己的理解是，<code>mysql</code> 和 <code>mariadb</code> 兩個指令是通用的？只是歷史因素，所以一般仍習慣使用 <code>mysql</code> 指令。</p>
+<h3 id="2-2-mysql-和-mysqld-這兩個指令差在哪？多了一個-d-是什麼意思？"><a href="#2-2-mysql-和-mysqld-這兩個指令差在哪？多了一個-d-是什麼意思？" class="headerlink" title="2.2 mysql 和 mysqld 這兩個指令差在哪？多了一個 d 是什麼意思？"></a>2.2 <code>mysql</code> 和 <code>mysqld</code> 這兩個指令差在哪？多了一個 d 是什麼意思？</h3><p><code>mysql</code> 是進入資料庫終端操作介面，而 <code>mysqld</code> 則是將資料庫伺服器啟動起來，換句話說在使用 <code>mysql</code> 指令前，需要確保已經使用過 <code>mysqld</code> 將資料庫服務運行起來（Linux 中使用 <code>systemctl start mariadb.service</code> 將服務運行起來）。</p>
+<p>在尋找資料的過程中，發現末端帶 d 這件事似乎是一個慣例，而 d 的意思是 daemon，意思是這個程序是 daemon process，目前的理解是：</p>
+<ul>
+<li>daemon process: 守護程序，除非系統關閉或是主動砍掉進程，否則該程序一直運行。</li>
+<li>normal process: 一般程序，當父進程關閉（例如：終端關閉），則程序也跟著關閉。</li>
+</ul>
+<h2 id="3-實際操作"><a href="#3-實際操作" class="headerlink" title="3. 實際操作"></a>3. 實際操作</h2><h3 id="3-1-安裝資料庫服務"><a href="#3-1-安裝資料庫服務" class="headerlink" title="3.1 安裝資料庫服務"></a>3.1 安裝資料庫服務</h3><ul>
+<li>Linux (CentOS 7): 使用 yum 指令安裝 mariadb<br><code>yum install mariadb</code></li>
+<li>Mac: 使用 brew 指令安裝 mariadb<br><code>brew install mariadb</code></li>
+</ul>
+<h3 id="3-2-啟動資料庫服務"><a href="#3-2-啟動資料庫服務" class="headerlink" title="3.2 啟動資料庫服務"></a>3.2 啟動資料庫服務</h3><ul>
+<li>Linux (CentOS 7): 使用 systemctl 指令啟動 mariadb<br><code>systemctl start mariadb.service</code></li>
+<li>Mac: 使用 mysqld<br><code>mysqld</code> or <code>mariadbd</code><blockquote>
+<p><a target="_blank" rel="noopener" href="https://mariadb.com/kb/en/starting-and-stopping-mariadb-automatically/">https://mariadb.com/kb/en/starting-and-stopping-mariadb-automatically/</a></p>
+</blockquote>
+</li>
+</ul>
+<h3 id="3-3-關閉資料庫服務"><a href="#3-3-關閉資料庫服務" class="headerlink" title="3.3 關閉資料庫服務"></a>3.3 關閉資料庫服務</h3><ul>
+<li>Linux (CentOS 7):<br><code>systemctl stop mariadb.service</code><blockquote>
+<p><a target="_blank" rel="noopener" href="https://mariadb.com/kb/en/systemd/">https://mariadb.com/kb/en/systemd/</a></p>
+</blockquote>
+</li>
+<li>Mac:<br><code>mysqladmin --wait-for-all-slaves shutdown</code><blockquote>
+<p><a target="_blank" rel="noopener" href="https://mariadb.com/kb/en/mysqladmin/">https://mariadb.com/kb/en/mysqladmin/</a></p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>注意：直接使用 <code>kill -9 &lt;PID&gt;</code> 關閉資料庫，會壞掉（詳細原因不清楚）</p>
+</blockquote>
+<h3 id="3-4-進入資料庫操作環境"><a href="#3-4-進入資料庫操作環境" class="headerlink" title="3.4 進入資料庫操作環境"></a>3.4 進入資料庫操作環境</h3><p>進入資料庫終端操作介面後，在 Linux (CentOS 7) 和 Mac 環境下，基本上操作方式都一致（目前沒有遇到不相同）<br><code>mysql</code><br>or<br><code>mysql --user=&lt;your-user-name&gt; --password=&lt;your-password&gt; [database-name]</code></p>
+<h3 id="3-5-基本觀念"><a href="#3-5-基本觀念" class="headerlink" title="3.5 基本觀念"></a>3.5 基本觀念</h3><ul>
+<li>在資料庫專端介面中所有語句結尾都需要加上 <code>;</code> or <code>\g</code> or <code>\G</code> (大寫 G 可以使返回結果垂直排列)</li>
+<li>如何查找指令使用方式？問號後給出關鍵字即可 <code>? &lt;keyword&gt;</code></li>
+<li><code>help</code> or <code>\h</code> 指令，列出命令清單</li>
+</ul>
+<h3 id="3-6-一般操作"><a href="#3-6-一般操作" class="headerlink" title="3.6 一般操作"></a>3.6 一般操作</h3><ul>
+<li>查看當前資料庫<br><code>SHOW databases;</code></li>
+<li>切換資料庫<br><code>USE &lt;your-database&gt;;</code></li>
+<li>查看資料表（記得要先切到特定資料庫）<br><code>SHOW tables;</code></li>
+<li>查看資料欄位（記得要先切到特定資料庫）<br><code>DESC &lt;your-table&gt;;</code></li>
+<li>查看當前資料庫版本<br><code>SELECT version();</code></li>
+<li>查看當前使用者<br><code>SELECT user();</code></li>
+<li>查看使用者列表（使用者資料會被存在名為 mysql 庫的 user 表中）<br><code>SELECT user, host FROM mysql.user</code></li>
+<li>建立使用者<br><code>CREATE USER &#39;jeffrey&#39;@&#39;localhost&#39; IDENTIFIED BY &#39;mypass&#39;;</code></li>
+<li>設定使用者權限（ALL 表示權限全開，ON 後面接特定資料庫表，TO 接使用者）<br><code>GRANT ALL ON db1.* TO &#39;jeffrey&#39;@&#39;localhost&#39;;</code><br>or<br><code>GRANT ALL PRIVILEGES ON &#39;your-db-name&#39;.* to &#39;your-user-name&#39;@&#39;%&#39; WITH GRANT OPTION;</code></li>
+<li>匯入資料庫<br><code>source &lt;your_.sql_file_path&gt;</code></li>
+<li>重置 AUTO_INCREMENT<br><code>ALTER TABLE &#39;your-table-name&#39; AUTO_INCREMENT = 1</code></li>
+</ul>
+<h2 id="4-其餘進階操作"><a href="#4-其餘進階操作" class="headerlink" title="4. 其餘進階操作"></a>4. 其餘進階操作</h2><ul>
+<li>資料庫操作</li>
+<li>資料表操作<ul>
+<li>修改資料表名稱<br>  <code>ALTER TABLE &lt;old_name&gt; RENAME TO &lt;new_name&gt;;</code></li>
+</ul>
+</li>
+<li>欄位操作<ul>
+<li>顯示欄位資訊<br>  <code>DESC &lt;table&gt;;</code><br>  or<br>  <code>SELECT COLUMNS FROM &lt;table&gt;;</code></li>
+</ul>
+</li>
+<li><a target="_blank" rel="noopener" href="https://mariadb.com/kb/en/account-management-sql-commands/">使用者管理</a><ul>
+<li>建立使用者<br>  <code>CREATE USER &lt;someone@localhost&gt; IDENTIFIED BY &lt;password&gt;;</code></li>
+<li>移除使用者<br>  <code>DROP USER &lt;someone@localhost&gt;;</code></li>
+<li>查看使用者和連線資訊<br>  <code>SELECT user, host FROM mysql.user</code><blockquote>
+<p>使用者的 host，表示限制該使用者必須來自該網段才允許連線（user@localhost -&gt; 該使用者必須來自本機）</p>
+</blockquote>
+</li>
+<li>資料庫的 15 種權限<br>  ALL PRIVILEGES | ALTER | CREATE | DELETE | DROP | FILE | INDEX | INSERT | PROCESS | REFERENCES | RELOAD | SELECT | SHUTDOWN | UPDATE | USAGE</li>
+<li>資料表的 8 種權限<br>  SELECT | INSERT | UPDATE | DELETE | CREATE | DROP | INDEX | ALRTER</li>
+<li>資料欄位的 3 種權限<br>  SELECT | INSERT | UPDATE</li>
+<li>查看使用者權限<br>  <code>SHOW GRANTS FOR &lt;someone@localhost&gt;;</code> : 顯示使用者 &lt;someone@localhost&gt; 權限<br>  or<br>  <code>SHOW GRANTS;</code> : 顯示當前使用者權限</li>
+</ul>
+</li>
+<li>資料庫匯出</li>
+<li>修復與優化<br>  <code>REPAIR TABLE &lt;table&gt;;</code><br>  <code>OPTIMIZE TABLE &lt;table&gt;;</code></li>
+<li>其他<br>  <code>mysqladmin ping;</code><br>  <code>mysqladmin variables;</code><br>  <code>mysqladmin reload;</code></li>
+</ul>
+<h2 id="5-文章查詢"><a href="#5-文章查詢" class="headerlink" title="5. 文章查詢"></a>5. 文章查詢</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://mariadb.com/kb/en/documentation/">https://mariadb.com/kb/en/documentation/</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.mysqltutorial.org/">https://www.mysqltutorial.org</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.xuite.net/towns/hc/65849335">https://blog.xuite.net/towns/hc/65849335</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/mysql-mariadb-linux/">#mysql, mariadb, linux</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>MariaDB 終端操作（Command-Line Client）</div>
+      <div>http://example.com/2022/03/21/MariaDB-終端操作（Command-Line-Client）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Chen Po Yu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>March 21, 2022</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/03/26/SSH-%E9%80%A3%E7%B7%9A%E6%8C%87%E4%BB%A4/" title="SSH 連線指令">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">SSH 連線指令</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

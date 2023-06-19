@@ -1,0 +1,717 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fish-favicon.png">
+  <link rel="icon" href="/img/fish-favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Chen Po Yu">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言在看第三方工具文件、研究 JavaScript 打包工具時，總有意無意看見這類技術名詞，CommonJS、AMD、UMD、ESM⋯⋯等。 就在好好研究後，才發覺『這些知識應該作為學習打包工具前的背景知識』。那麼讓我們開始吧！ 時代背景JavaScript 語言最早是為了解決網頁能和瀏覽器之間互動的問題而被發明的，輕便、容易使用成了設計他的目的。  JavaScript modules - A">
+<meta property="og:type" content="article">
+<meta property="og:title" content="關於 JS 模組化：CMJ, AMD, CMD, UMD, ESM, IIFE">
+<meta property="og:url" content="http://example.com/2023/01/13/%E9%97%9C%E6%96%BC-JS-%E6%A8%A1%E7%B5%84%E5%8C%96%EF%BC%9ACMJ-AMD-CMD-UMD-ESM-IIFE/index.html">
+<meta property="og:site_name" content="pyshif blog">
+<meta property="og:description" content="前言在看第三方工具文件、研究 JavaScript 打包工具時，總有意無意看見這類技術名詞，CommonJS、AMD、UMD、ESM⋯⋯等。 就在好好研究後，才發覺『這些知識應該作為學習打包工具前的背景知識』。那麼讓我們開始吧！ 時代背景JavaScript 語言最早是為了解決網頁能和瀏覽器之間互動的問題而被發明的，輕便、容易使用成了設計他的目的。  JavaScript modules - A">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-01-13T18:39:00.000Z">
+<meta property="article:modified_time" content="2023-06-19T09:38:54.485Z">
+<meta property="article:author" content="Chen Po Yu">
+<meta property="article:tag" content="Module, CMJ, AMD, UMD, CMD, ESM, IIFE">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+    <!-- Google tag (gtag.js) --> <script async src="https://www.googletagmanager.com/gtag/js?id=G-LG5KBKG5S0"></script> <script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date());
+gtag("config", "G-LG5KBKG5S0"); </script>
+  
+  <title>關於 JS 模組化：CMJ, AMD, CMD, UMD, ESM, IIFE - pyshif blog</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hint.css@2/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  <link rel="stylesheet" href="/css/about-avatar.css" />
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Web Learning</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/your-advice/">
+                <i class="iconfont icon-pen"></i>
+                Your Advice
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="關於 JS 模組化：CMJ, AMD, CMD, UMD, ESM, IIFE"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-01-13 18:39" pubdate>
+          January 13, 2023 pm
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          2.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          24 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">關於 JS 模組化：CMJ, AMD, CMD, UMD, ESM, IIFE</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在看第三方工具文件、研究 JavaScript 打包工具時，總有意無意看見這類技術名詞，CommonJS、AMD、UMD、ESM⋯⋯等。</p>
+<p>就在好好研究後，才發覺『這些知識應該作為學習打包工具前的背景知識』。那麼讓我們開始吧！</p>
+<h2 id="時代背景"><a href="#時代背景" class="headerlink" title="時代背景"></a>時代背景</h2><p>JavaScript 語言最早是為了解決網頁能和瀏覽器之間互動的問題而被發明的，輕便、容易使用成了設計他的目的。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules">JavaScript modules - A background on modules | MDN</a></p>
+</blockquote>
+<p>因此，在當時 JS 並沒有『模組化』的相關語法，我們的代碼全部處在同一個全域環境。隨著，網頁的開發越來越複雜，這樣的環境在維護上帶來許多不便。最後開發者社群，開始依照規範實作出『模組化』的方式。這也是我們看到 CommonJS、AMD、CMD、UMD、ESM 這麼多不同方式的原因。</p>
+<p>回到現今 2023，身為一個前端開發人員，我們究竟要學習什麼？我想作為入門來說，我們可以把重點放在 ESM，並且大概了解其於 CommonJS、AMD、CMD、UMD 這些名詞的概念即可！</p>
+<blockquote>
+<p>推薦閱讀：<a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/03/es-modules-a-cartoon-deep-dive/">ES modules: A cartoon deep-dive</a></p>
+</blockquote>
+<h2 id="CMJ-CommonJS"><a href="#CMJ-CommonJS" class="headerlink" title="CMJ - CommonJS"></a>CMJ - CommonJS</h2><p>CommonJS 專案在 2009 年 1 月由 Mozilla 工程師 Kevin Dangoor 建立，並且一開始的名稱為 ServerJS。目的是為了，在瀏覽器的環境之外建立 JavaScript 生態系，其中著名的應用環境就是 Node.js。在 CommonJS 中，使用 <code>require()</code> 函式來引用模組，<code>module.exports</code> 來導出。</p>
+<p>我們需要知道的是，CommonJS 只用於服務端（Node.js）環境中，並不能用於瀏覽器環境。如果要將其使用在瀏覽器環境下，我們必須透過 JavaScript Module Loader 來替我們處理（引入 <code>require.js</code> 庫，並指定主文件入口）。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">data-main</span>=<span class="hljs-string">&quot;scripts/main&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;scripts/require.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>關於 RequireJS 的更多訊息：<a target="_blank" rel="noopener" href="https://requirejs.org/">A JavaScript Module Loader</a></p>
+</blockquote>
+<h2 id="AMD-Asynchronous-Module-Definition"><a href="#AMD-Asynchronous-Module-Definition" class="headerlink" title="AMD - Asynchronous Module Definition"></a>AMD - Asynchronous Module Definition</h2><p>在服務端有了 CommonJS 解決模組化的問題後，瀏覽器端則是出現了 AMD 的解決方案。從名稱我們大概就可以猜到，它提供『異步』加載模組的方式。比起 CommonJS 以同步的方式來加載模組，受限於網速、並發數等的瀏覽器環境更為適合。在語法使用上，引入／導出 分別用 <code>require</code> 和 <code>define</code>。</p>
+<p>要在瀏覽器端使用 AMD 的話，我們有幾種選擇：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://requirejs.org/">RequireJS</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/cujojs/curl">curl</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/zazl/lsjs">lsjs</a></li>
+<li><a target="_blank" rel="noopener" href="https://dojotoolkit.org/">Dojo 1.7+</a></li>
+</ul>
+<p>同樣於瀏覽器中引入庫文件，並指定主文件入口：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-comment">&lt;!-- example require.js --&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">data-main</span>=<span class="hljs-string">&quot;scripts/main&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;scripts/require.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>關於 AMD 更多訊息：<a target="_blank" rel="noopener" href="https://requirejs.org/docs/whyamd.html#youcando">What You Can Do - Why AMD ?</a></p>
+</blockquote>
+<h2 id="CMD-Common-Module-Definition"><a href="#CMD-Common-Module-Definition" class="headerlink" title="CMD - Common Module Definition"></a>CMD - Common Module Definition</h2><p>CMD 本身和 AMD 相類似，同樣為具有『異步』的特性。差別在於：</p>
+<ul>
+<li>AMD: 依賴前置，在依賴模塊加載完畢後，即調用回調函式（你的代碼）</li>
+<li>CMD: 依賴後製，在依賴模塊家載完畢後，不會立即調用回調函式；而是，當主函式執行後且使用到時才運行。</li>
+</ul>
+<p>要使用 CMD，我們需要使用 <a target="_blank" rel="noopener" href="https://github.com/seajs/seajs">sea.js</a> 這個 Module Loader。</p>
+<blockquote>
+<p>關於 Sea.js 更多資訊 <a target="_blank" rel="noopener" href="https://seajs.github.io/seajs/docs/en.html">Why use Sea.js ?</a></p>
+</blockquote>
+<h2 id="UMD-Universal-Module-Definition"><a href="#UMD-Universal-Module-Definition" class="headerlink" title="UMD - Universal Module Definition"></a>UMD - Universal Module Definition</h2><p>UMD 被設計用來同時使用在服務端、瀏覽器端。它整合了 AMD 和 CommonJS，大多數時候使用 AMD，在少數特別的情況使用 CommonJS 處理。</p>
+<blockquote>
+<p>關於 UMD 更多資訊 <a target="_blank" rel="noopener" href="https://github.com/umdjs/umd">Universal Module Definition</a></p>
+</blockquote>
+<h2 id="ESM-ES-Module-aka-ES6-Module-aka-ES2015-Module"><a href="#ESM-ES-Module-aka-ES6-Module-aka-ES2015-Module" class="headerlink" title="ESM - ES Module aka ES6 Module aka ES2015 Module"></a>ESM - ES Module aka ES6 Module aka ES2015 Module</h2><p>ECMAScript 標準在 ES6 (aka ES2015) 加入了『模組化』的語法，<code>import</code>／<code>export</code>；然而，在當時的瀏覽器環境中尚未實作這樣的機制，因此，為了解決這樣的問題，社群開發出各式各樣的打包工具：<code>Webpack</code>、<code>Rollup</code> 等，讓我們在 Node.js 環境下使用 ES Module 的模組化語法。</p>
+<blockquote>
+<p>所以實際上我們使用的是 ES Module in Node.js，而後來瀏覽器環境實作的是 Native ES Module（有說錯再麻煩指教！）</p>
+</blockquote>
+<blockquote>
+<p>進一步了解 Webpack <a target="_blank" rel="noopener" href="https://blog.huli.tw/2020/01/21/webpack-newbie-tutorial/">webpack 新手教學之淺談模組化與 snowpack</a></p>
+</blockquote>
+<h2 id="IIFE-Immediately-Invoked-Function-Expression-Module"><a href="#IIFE-Immediately-Invoked-Function-Expression-Module" class="headerlink" title="IIFE - Immediately Invoked Function Expression Module"></a>IIFE - Immediately Invoked Function Expression Module</h2><p>用於 <code>&lt;script&gt;</code> 標籤，通常使用這樣的格式來作為打包網頁應用的結果。這樣的方式幫助我們避免變數名稱的衝突，以及保持代碼的私有性。</p>
+<h2 id="編譯時期-vs-運行時期"><a href="#編譯時期-vs-運行時期" class="headerlink" title="編譯時期 vs 運行時期"></a>編譯時期 vs 運行時期</h2><p>在上述各種模組化工具中，在循環依賴上時存在差異，細節部分就沒有進一步研究，盼各位讀者自行深入。</p>
+<p>而其中，ESM 和其於的模組化方式最為不同的在於，ESM 在編譯時期進行『符號（記憶體位置？）的引用』，而其他則是在執行時期進行『對象的引用』。</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><blockquote>
+<p>目前而言只使用過 CommonJS、ES Module，對於其他的模組化方式只有淺薄的了解，若讀者有興趣可以參考文章中各個連結，進一步深入。</p>
+</blockquote>
+<p>JavaScript 為了能夠在『服務端、瀏覽器端』達成模組化，經歷了一段路程。</p>
+<p>在了解這段歷史之後，我們對於為什麼使用打包工具、以及 JS 模組化是什麼都有了解答。</p>
+<p>最後讓我們簡單整理下各種『模組化』的技術可以使用在哪些環境上：</p>
+<table>
+<thead>
+<tr>
+<th align="center">-</th>
+<th align="center">AMD</th>
+<th align="center">CommonJS</th>
+<th align="center">UMD</th>
+<th align="center">CMD</th>
+<th align="center">ES Module</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Browser</td>
+<td align="center">😄</td>
+<td align="center">❌</td>
+<td align="center">😄</td>
+<td align="center">😄</td>
+<td align="center">😄</td>
+</tr>
+<tr>
+<td align="center">Server</td>
+<td align="center">❌</td>
+<td align="center">😄</td>
+<td align="center">😄</td>
+<td align="center">❌</td>
+<td align="center">😄</td>
+</tr>
+<tr>
+<td align="center">Async</td>
+<td align="center">😄</td>
+<td align="center">❌</td>
+<td align="center">😄</td>
+<td align="center">😄</td>
+<td align="center">😄</td>
+</tr>
+</tbody></table>
+<ul>
+<li>CommonJS 要使用於瀏覽器環境，必須使用相關的套件、工具（RequireJS, Browserify）</li>
+</ul>
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules</a></li>
+<li><a target="_blank" rel="noopener" href="https://hacks.mozilla.org/2018/03/es-modules-a-cartoon-deep-dive/">https://hacks.mozilla.org/2018/03/es-modules-a-cartoon-deep-dive/</a></li>
+<li><a target="_blank" rel="noopener" href="https://betterprogramming.pub/what-are-cjs-amd-umd-esm-system-and-iife-3633a112db62">https://betterprogramming.pub/what-are-cjs-amd-umd-esm-system-and-iife-3633a112db62</a></li>
+<li><a target="_blank" rel="noopener" href="https://requirejs.org/">https://requirejs.org</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/6956117965620117541#heading-6">https://juejin.cn/post/6956117965620117541#heading-6</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.huli.tw/2020/01/21/webpack-newbie-tutorial/">https://blog.huli.tw/2020/01/21/webpack-newbie-tutorial/</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Module-CMJ-AMD-UMD-CMD-ESM-IIFE/">#Module, CMJ, AMD, UMD, CMD, ESM, IIFE</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>關於 JS 模組化：CMJ, AMD, CMD, UMD, ESM, IIFE</div>
+      <div>http://example.com/2023/01/13/關於-JS-模組化：CMJ-AMD-CMD-UMD-ESM-IIFE/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Chen Po Yu</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>January 13, 2023</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>Licensed under</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/01/26/%E7%90%86%E8%A7%A3-Vue-3-ref-%E5%92%8C-reactive/" title="理解 Vue 3 ref() 和 reactive()">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">理解 Vue 3 ref() 和 reactive()</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/12/26/%E6%87%B5%E6%87%82-Webpack-5-React/" title="懵懂 Webpack 5 (React)">
+                        <span class="hidden-mobile">懵懂 Webpack 5 (React)</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;Table of Contents</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
